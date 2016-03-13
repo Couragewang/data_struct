@@ -50,7 +50,7 @@ class hash_table{
 			++hash_size;
 			return true;
 		}
-		bool hash_find(const k& val, size_t pos/*out*/)
+		bool hash_find(const k& val, size_t &pos/*out*/)
 		{
 			if(is_empty()){
 				cerr<<"hash table is empty\n"<<endl;
@@ -58,6 +58,7 @@ class hash_table{
 			}
 			size_t hash_key = hash(val);
 			size_t begin_key = hash_key;
+			pos = 0;
 			do{
 				if( hash_elem_status[begin_key] == EXIST && hash_table_p[begin_key] == val){//数据存在，并且值为目标值
 					pos = begin_key;
