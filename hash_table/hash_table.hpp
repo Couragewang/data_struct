@@ -64,7 +64,6 @@ class hash_table{
 					pos = begin_key;
 					return true;
 				}
-				//线性探测
 				++begin_key;
 				if( begin_key == hash_capacity ){
 					begin_key = 0;
@@ -76,7 +75,7 @@ class hash_table{
 		{
 			size_t pos;
 			if(hash_find(val, pos)){
-				hash_elem_status[pos] = DELETED;
+				hash_elem_status[pos] = DELETED;//懒删除
 				--hash_size;
 				return true;
 			}
@@ -91,6 +90,7 @@ class hash_table{
 		}
 	protected:
 		//除模取余
+		//线性探测
 		size_t hash(const k &val)
 		{
 			return val%hash_capacity;
