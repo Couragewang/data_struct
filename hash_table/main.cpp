@@ -14,18 +14,18 @@ int main()
 	_hash.hash_insert(3);
 	sleep(1);
 	_hash.print();
-	_hash.hash_insert(4);
+	_hash.hash_insert(24);
 	sleep(1);
 	_hash.print();
-	_hash.hash_insert(5);
+	_hash.hash_insert(25);
 	sleep(1);
 	_hash.print();
-	_hash.hash_insert(6);
+	_hash.hash_insert(26);
 	sleep(1);
 	_hash.print();
 
 	cout<<"remove begin"<<endl;
-	_hash.hash_remove(5);
+	_hash.hash_remove(25);
 	sleep(1);
 	_hash.print();
 	_hash.hash_remove(4);
