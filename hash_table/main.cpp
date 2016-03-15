@@ -4,7 +4,7 @@
 int main()
 {
 	cout<<"insert begin!"<<endl;
-	bucket::hash_table<int> _hash(23);
+	//bucket::hash_table<int> _hash(23);
 //	_hash.hash_insert(1);
 //	sleep(1);
 //	_hash.print();
