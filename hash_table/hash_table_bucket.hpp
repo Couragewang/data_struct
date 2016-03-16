@@ -54,13 +54,24 @@ namespace bucket{
 			return KDRHash(s.c_str());
 		}
 	};
+	template<>
+	struct __hash_func<int>{
+		static size_t int_hash(const int &val)
+		{
+			cout<<"use hash int"<<endl;
+			return val+100; 
+		}
+
+		size_t operator()(const int & val){
+			return int_hash(val);
+		}
+	};
 
     template <class k, class v, template<class> class hash_func = __hash_func>
     class hash_table{
+	    typedef struct hash_table_node<k, v> node;
+	    typedef struct hash_table_node<k, v>* node_p;
     	private:
-			typedef struct hash_table_node<k, v> node;
-			typedef struct hash_table_node<k, v>* node_p;
-
 			//查找最小的大于size的素数，作为hash表的大小
 			size_t get_prime_num(size_t size)
 			{
@@ -78,7 +89,7 @@ namespace bucket{
 			{
 				return new node(_key, _value);
 			}
-			void delete_node(const node *&_n)
+			void delete_node(const node_p &_n)
 			{
 				if(_n){
 					delete _n;
@@ -94,8 +105,10 @@ namespace bucket{
 			bool check_capacity(size_t _size)
 			{
 				if(size < hash_table_bucket.size()){//负载因子 < 1
+					cout<<"无需自增"<<endl;
 					return false;
 				}
+				cout<<"负载因子大于1， 需自增!"<<endl;
 
 				// 如果size大于table的大小，则进行重建，重新负载节点
 				size_t new_capacity = get_prime_num(size);
@@ -143,6 +156,7 @@ namespace bucket{
 				node_p tmp  = buy_node(_key, _value);
 				tmp->next = hash_table_bucket[index];//指向特定桶首部
 				hash_table_bucket[index] = tmp;
+				return true;
 			}
 			const node_p hash_find(const k &_key)
 			{
@@ -191,7 +205,7 @@ namespace bucket{
 				for(size_t i = 0; i < hash_table_bucket.size(); i++){
 					node_p begin = hash_table_bucket[i];
 					while(begin){
-						cout<<"{ "<<begin->key<<" : "<<begin->value<<" },";
+						cout<<"{ "<<begin->key<<" : "<<begin->val<<" },";
 						begin = begin->next;
 					}
 					cout<<"{ NULL, NULL}"<<endl;
@@ -205,11 +219,4 @@ namespace bucket{
 			size_t size;                    //实际node的个数
     };
 }
-
-
-
-
-
-
-
 

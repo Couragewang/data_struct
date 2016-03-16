@@ -1,31 +1,55 @@
 #include <iostream>
 using namespace std;
-
-template<typename T>
-const T& sum(const T &x, const T &y, const T &z)
-{
-	cout<<"fun1"<<endl;
-	return x + y + z;
-}
-
-template<typename T1, typename T2>
-const T1& sum(const T1 &x, const T2 &y)
-{
-	cout<<"fun2"<<endl;
-	return x + y;
-}
-
+class test{
+	private:
+		int a;
+	public:
+		test(int _a)
+		{
+			cout<<"construct"<<endl;
+		}
+		~test()
+		{
+		}
+	    const test& operator()(int _a)
+	    {
+	    	cout<<"operator : "<<_a<<endl;
+	    }
+};
 int main()
 {
-	int a = 10;
-	int b = 10;
-	int c = 10;
-	cout<<sum(a, b,c)<<endl;
-	double d = 3.14;
-	cout<<sum(d, a)<<endl;
-	return 0;
+	test(3)(3);
+//	char *p = "hello world";
+//	while(*p){
+//		cout<<(*++p)<<" "<<endl;
+//	}
 }
 
+//template<typename T>
+//const T& sum(const T &x, const T &y, const T &z)
+//{
+//	cout<<"fun1"<<endl;
+//	return x + y + z;
+//}
+//
+//template<typename T1, typename T2>
+//const T1& sum(const T1 &x, const T2 &y)
+//{
+//	cout<<"fun2"<<endl;
+//	return x + y;
+//}
+//
+//int main()
+//{
+//	int a = 10;
+//	int b = 10;
+//	int c = 10;
+//	cout<<sum(a, b,c)<<endl;
+//	double d = 3.14;
+//	cout<<sum(d, a)<<endl;
+//	return 0;
+//}
+//
 //const T& add(const T &_val1, const T &_val2)
 //{
 //	return _val1+_val2;

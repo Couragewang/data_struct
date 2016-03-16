@@ -85,7 +85,8 @@ class hash_table{
 		}
 		void print()
 		{
-			for( size_t i = 0; i < hash_capacity; i++){
+			//for( size_t i = 0; i < hash_capacity; i++){
+			for( size_t i = 0; i < size; i++){
 				cout<<"[ "<<hash_table_p[i]<<" : "<<hash_elem_status[i]<<" ]";
 			}
 			cout<<endl;
