@@ -36,7 +36,8 @@ int main()
 
 	cout<<" 转置 ＝ 》 ";
 	sparse_matrix<int> _target_matrix(NULL, 0, 0, 0);
-	_matrix.transpose(_target_matrix);
+	//_matrix.transpose(_target_matrix);
+	_matrix.fast_transport(_target_matrix);
 	_target_matrix.display();
 
 

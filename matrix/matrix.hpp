@@ -41,7 +41,7 @@ struct trituple{
 	int row;
 	int col;
 	T val;
-	trituple(int _row, int _col, const T &_val)
+	trituple(int _row = 0, int _col = 0, const T &_val = 0)
 		:row(_row),
 		col(_col),
 		val(_val)
@@ -112,6 +112,11 @@ class sparse_matrix{
 			}
 		}
 
+
+		//关于行优先的思考：转置到并压缩存储，行相同的elems，肯定连续存储，并且行数越小，存储位置整体越靠前
+		//vector的存储数据的方式就好像甘蔗，每节存储的都是行相同元素，相邻节表示列相邻，并且节内部有序(同行不同列)，
+		//节与节整体有序(一节表示一行，行行之间有序)
+
 		//矩阵的转置,普通方式
 		int transpose(sparse_matrix<T> &_target)
 		{
@@ -133,6 +138,53 @@ class sparse_matrix{
 			return 0;
 		}
 
+		//1. 类内部元素直接赋值
+		//2. 统计原始矩阵中，每一列有效数据的个数(转置后，为每行元素的个数)
+		//3. 根据2，可以统计出，转置后每行在vector中的起始下标
+	    //4. 根据3，直接按照列优先遍历vactor，赋值给新vector	
+		int fast_transport(sparse_matrix<T> &_target)
+		{
+			//1.
+			//存储的时候是行优先存储，转置后，行变列，列变行。
+			//因此，变化之后的矩阵，再次压缩存储，对比于目前，就是列优先存储
+			_target.row_size = col_size; //行号为目前的列
+			_target.col_size = row_size; //列号为目前的行
+			_target.invalid = invalid;   //无效元素相同
+			int i = 0;
+			for( ; i < matrix.size(); i++ ){
+				_target.matrix.push_back(trituple<T>());//扩容至目标大小
+			}
+			//2.
+		    int *col_counts = new int[col_size];
+			memset(col_counts, 0, sizeof(int)*col_size);
+			for(int i = 0; i < matrix.size(); i++){ //遍历有效数据
+				col_counts[matrix[i].col]++; //列号从0开始 col_counts下标对应列号, 内容对应该列元素的个数
+			}
+
+			//3.
+			int *row_start = new int[col_size];
+			memset(row_start, 0, sizeof(int)*col_size);
+			row_start[0] = 0;//row_start按照列数来申请空间，其实就是转置后的行数,第一行的起始位置肯定为0
+			for(int i = 1; i < col_size; i++){
+				//row_start 下标对应转置后的行号（原始矩阵的列号，同上）, 内容对应该行在vector中的起始下标
+				row_start[i] = row_start[i-1] + col_counts[i-1]; //新一行的起始位置 ＝ 上一行的起始位置 ＋ 上一行元素个数
+			}
+
+			//4.
+			for(int i = 0; i < matrix.size(); i++){
+				int row_index = row_start[matrix[i].col]; //col => 目标vector 中的起始下标
+				_target.matrix[row_index].row = matrix[i].col;
+				_target.matrix[row_index].col = matrix[i].row;
+				_target.matrix[row_index].val = matrix[i].val;
+				++(row_start[matrix[i].col]); //对应列中元素已经插入taget， 更新同列中后续在vector中的下标
+			}
+
+			delete []col_counts;
+			delete []row_start;
+
+			return 0;
+		}
+
 		~sparse_matrix()
 		{}
 	private:
@@ -143,5 +195,9 @@ class sparse_matrix{
 };
 
 #endif
+
+
+
+
 
 
