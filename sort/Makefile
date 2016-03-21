@@ -1,5 +1,5 @@
 sort:main.cpp
-	gcc -o $@ $^
+	g++ -o $@ $^
 .PHONY:clean
 clean:
 	rm -f sort
