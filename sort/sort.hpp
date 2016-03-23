@@ -40,7 +40,7 @@ int bubble_sort(int *arr, int size)
 	return 0;
 }
 
-//插入排序
+//插入排序, 固定元素找位置
 int insert_sort(int *arr, int size)
 {
 	assert(arr);
@@ -68,6 +68,8 @@ int insert_sort(int *arr, int size)
 //后面步长变小，子序列变大，但由整体有序性越来越明显，排序效率依然很高，大大提高了时间效率。
 int shell_sort(int *arr, int size)
 {
+	assert(arr);
+
 	int step = size;
 	while(step > 1){
 
@@ -89,4 +91,57 @@ int shell_sort(int *arr, int size)
 	}
 	return 0;
 }
+
+//选择排序，固定位置找元素
+//思路: 序列中先找到最小的，然后放到第一个位置。之后再看剩余元素中最小的，
+//      放到第二个位置……以此类推，就可以完成整个的排序工作
+int select_sort(int *arr, int size)
+{
+	assert(arr);
+
+	for(int begin = 0; begin < size - 1; ++begin){//begin表示固定的位置
+		int min_index = begin;
+		for(int curr_index = begin + 1; curr_index < size; ++curr_index){
+			if(arr[min_index] > arr[curr_index]){ //小->大
+				min_index = curr_index; //更新最小数据下标
+			}
+		}
+		if(min_index != begin){
+			swap(arr[min_index], arr[begin]);//将最小数据交换到当前固定的位置处
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -10,8 +10,8 @@ int main()
 	}
 	//bubble_sort(arr,10);
 	//insert_sort(arr, 10);
-	
-	shell_sort(arr, 10);
+	//shell_sort(arr, 10);
+	select_sort(arr, 10);
 	show_arr(arr, 10);
 	return 0;
 }
