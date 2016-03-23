@@ -113,7 +113,32 @@ int select_sort(int *arr, int size)
 	return 0;
 }
 
+//选择排序优化，固定首尾两个位置来进行交换, 一次找到最大和最小值
+int select_sort_op(int *arr, int size)
+{
+	assert(arr);
 
+	int begin = 0; //首下标
+	int end = size -1;//尾下标
+
+	while(begin < end){//固定首尾位置 
+		//找到最大和最小数据，并放到首尾
+		int curr = begin;
+		while(curr < end){
+			if(arr[curr] < arr[begin]){//找到较小数据
+				swap(arr[curr], arr[begin]);//遍历一次，肯定找到最小的数据, 并且该数据在合适的位置上
+			}
+			if(arr[curr] > arr[end]){//同上
+				swap(arr[curr], arr[end]); //同上
+			}
+			++curr;
+		}
+		//更新范围
+		++begin;
+		--end;
+	}
+	return 0;
+}
 
 
 
