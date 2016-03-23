@@ -1,5 +1,7 @@
 #pragma once
+
 #include <iostream>
+#include <assert.h>
 using namespace std;
 void show_arr(int arr[], int size)
 {
@@ -17,8 +19,11 @@ static void swap(int &a, int &b)
 }
 
 //冒泡排序
+//思路：相邻数据比较将较大数据往后冒泡
 int bubble_sort(int *arr, int size)
 {
+	assert(arr);
+
 	int end = 0; //定位到数组最后一个元素
 	for( end = size - 1; end > 0; end-- ){
 		int flag = 0;
@@ -34,3 +39,54 @@ int bubble_sort(int *arr, int size)
 	}
 	return 0;
 }
+
+//插入排序
+int insert_sort(int *arr, int size)
+{
+	assert(arr);
+	int i = 1;
+	for( ; i < size; ++i ){
+		int tmp = arr[i];//保存第i个元素
+		int end = i - 1; //当前欲插入的数据的前一个位置
+		//按照从小到大的顺序排序
+		while(end >= 0  && tmp < arr[end]){
+			arr[end+1] = arr[end];
+			--end;
+		}
+		arr[end + 1] = tmp; //插入合适的位置,注意索引值
+	}
+	return 0;
+}
+
+//shell排序
+//对插入排序的优化
+//直接插入排序在序列完全逆序的时候，性能很差.（每次都全部要全部比较，同时有非常多次的移位操作）
+//对于插入排序，如果待排序数据越接近有序，则数据移动次数越少,插入排序性能较高.
+//思路： 待排序列有n个元素，先取一个小于n的整数h1作为第一个增量，把待排序列以间隔h1分成若干子序列，
+//       子序列内使用插入排序；然后取第二个增量h2(< h1)，重复上述的划分和排序，直至所取的增量hl = 1 (h1 > h2 > ... > hl)。
+//结论： 这样不管序列多么庞大，在先前较大步长分组下每个子序列规模都不是很大，用直接插入效率很高；
+//后面步长变小，子序列变大，但由整体有序性越来越明显，排序效率依然很高，大大提高了时间效率。
+int shell_sort(int *arr, int size)
+{
+	int step = size;
+	while(step > 1){
+
+		//了解步长的选择, Knuth提出的增量效果更好
+		step = step/3 + 1; //选择步长，划分子序列
+
+		//使用插入排序
+		int curr = step;
+		for( ; curr < size; ++curr ){
+			int end = curr - step;
+			int tmp = arr[curr];
+			//小 -> 大，小数据前移
+			while(end >= 0 && tmp < arr[end]){
+				arr[end + step] = arr[end];//大数据后移
+				end -= step; //更新索引，继续往前找
+			}
+			arr[end + step] = tmp;//将比较的tmp数据，放到该step序列的合理位置
+		}
+	}
+	return 0;
+}
+
