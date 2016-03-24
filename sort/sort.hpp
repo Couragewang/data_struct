@@ -146,8 +146,10 @@ int heap_sort()
 	//详情见heap章节，这里不在讲解
 }
 
-
-
+//快速排序
+int quick_sort()
+{
+}
 
 
 
