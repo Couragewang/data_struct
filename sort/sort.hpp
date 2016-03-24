@@ -140,8 +140,11 @@ int select_sort_op(int *arr, int size)
 	return 0;
 }
 
-
-
+//堆排序
+int heap_sort()
+{
+	//详情见heap章节，这里不在讲解
+}
 
 
 
