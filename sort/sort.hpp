@@ -144,12 +144,81 @@ int select_sort_op(int *arr, int size)
 int heap_sort()
 {
 	//详情见heap章节，这里不在讲解
+	return 0;
 }
 
 //快速排序
-int quick_sort()
+//思想：快速排序采用的思想是分治思想。
+//      快速排序是找出一个元素（理论上可以随便找一个）作为基准(pivot),然后对数组进行分区操作,使基准左边元素的值都不大于基准值,基准右边的元素值 都不小于基准值，
+//      如此作为基准的元素调整到排序后的正确位置。递归快速排序，将其他n-1个元素也调整到排序后的正确位置。最后每个元素都是在排序后的正确位置，排序完成。所以快
+//      速排序算法的核心算法是分区操作，即如何调整基准的位置以及调整返回基准的最终位置以便分治递归.
+//left和right都是下标
+
+int get_mid_index(int arr[], int left, int right)
 {
+	int mid = left + ((right-left)>>1);
+	//找出left right mid中的中间值，作为key
+	if( arr[left] < arr[right] ){
+		if( arr[mid] > arr[right] ){
+			return right;            //mid > right > left
+		}else if( arr[mid] < arr[left] ){
+			return left;             //right > left > mid
+		}else{
+			return mid;              //right > mid > left
+		}
+	}else{
+		if( arr[mid] > arr[left] ){
+			return left;             //mid > left > right
+		}else if( arr[mid] < arr[right] ){
+			return right;            //left > right > mid
+		}else{
+			return mid;              //left > mid > right
+		}
+	}
 }
+
+//快排单次，挖坑法
+int partion3(int arr[], int left, int right)
+{
+	int key_index = get_mid_index(arr, left, right);
+	if(key_index != right){
+		swap(arr[key_index], arr[right]);
+	}
+	int key = arr[right]; //right新坑
+	int begin = left;
+	int end   = right;
+
+	while(begin < end){
+		while(begin < end && arr[begin] <= key){ //从左->右查找大于key的值, 此时end是坑
+			++begin;
+		}
+		//此时，在begin处找到一个大于key的数据，填旧坑，挖新坑
+		if(begin < end){
+			arr[end] = arr[begin];//此时begin成为了新坑,注意key值始终没有变化 
+		}
+		while(end > begin && arr[end] >= key){//从右->左查找小于key的值
+			--end;
+		}
+		if(end > begin){
+			arr[begin] = arr[end]; //此时end又重新成为了新坑
+		}
+	}
+	arr[end] = key;
+	return begin;
+}
+
+int quick_sort(int arr[], int left, int right)
+{
+	if(left < right){
+		int boundary = partion3(arr, left, right);
+        quick_sort(arr, left, boundary-1);
+        quick_sort(arr, boundary+1, right);
+	}
+	return 0;
+}
+
+
+
 
 
 

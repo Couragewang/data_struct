@@ -12,7 +12,9 @@ int main()
 	//insert_sort(arr, 10);
 	//shell_sort(arr, 10);
 	//select_sort(arr, 10);
-	select_sort_op(arr, 10);
+	//select_sort_op(arr, 10);
+	
+	quick_sort(arr, 0, 9);
 	show_arr(arr, 10);
 	return 0;
 }
