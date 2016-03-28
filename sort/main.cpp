@@ -18,6 +18,7 @@ int main()
 	//quicksort_nonrecursive(arr, 0, 9);
 	//merge_sort(arr, 10);
 	//merge_sort_r(arr, 10);
+	sort_count(arr, 10);
 	show_arr(arr, 10);
 	return 0;
 }

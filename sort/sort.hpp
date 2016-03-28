@@ -416,7 +416,43 @@ void merge_sort_r(int arr[], int size)
 	merge_r(src, dst, 0, size);
 	delete []dst;
 }
+///////////////////////////////////////////////////////////
+//非比较排序 －> 计数排序 & 基数排序
 
+//计数排序
+void sort_count(int *arr, int size)
+{
+	assert(arr);
+
+	int max = arr[0];
+	int min = arr[0];
+
+	int i = 1;
+	for( ; i < size; i++ ){
+		if(max < arr[i]){
+			max = arr[i]; //找到序列中最大数据
+		}
+		if(min > arr[i]){
+			min = arr[i]; //找到序列中最小数据
+		}
+	}
+	//cout<<max<<" "<<min<<endl;
+	int range = max - min + 1;
+	int *count = new int[range];
+	memset(count, 0, sizeof(int)*range);
+	// 统计min-max范围内数据的出现个数
+	for( i = 0; i < size; i++ ){
+		count[ arr[i] - min ]++; //统计数据出现的次数。下标的对应关系是，0代表最小元素
+	}
+	// 根据统计数据的个数进行排序
+	int index = 0;
+	for(i = 0; i < range; i++){
+		while(count[i]--){
+			arr[index++] = min + i;
+		}
+	}
+	delete []count;
+}
 
 
 
