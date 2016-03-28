@@ -1,8 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <stack>
 #include <assert.h>
 using namespace std;
+
 void show_arr(int arr[], int size)
 {
 	for(int i = 0; i<size; i++){
@@ -207,26 +209,114 @@ int partion3(int arr[], int left, int right)
 	return begin;
 }
 
+//快排单次，（Hoare霍尔版本)
+int partion2(int arr[], int left, int right)
+{
+	//首先获得key
+	int key_index = get_mid_index(arr, left, right);
+	if(key_index != right){
+		swap(arr[key_index], arr[right]);
+	}
+	int key = arr[right]; //right新坑
+	int begin = left;
+	int end   = right;
+
+	while(begin < end){
+		//从右往左寻找，找到第一个小于key的值，暂停
+		while(begin < end && arr[end] >= key){
+			--end;
+		}
+		//从左往右寻找，找到第一个大于key的值，暂停
+		while(begin < end && arr[begin] <= key){
+			++begin;
+		}
+		//此时，begin指向的数据大于key， end指向的数据小于key,交换位置
+		if(begin < end){
+			swap(arr[begin], arr[end]);
+		}
+	}
+	if(begin != right){
+		swap(arr[begin], arr[right]); //right 就是key值，在上面的操作中，肯定没有被移动，而begin指向最后和end重叠的数据，
+	}
+	return begin;
+}
+
+//快排单次, 前后指针版本
+//
+int partion1(int arr[], int left, int right)
+{
+	int key_index = get_mid_index(arr, left, right);
+	if(key_index != right){
+		swap(arr[key_index], arr[right]);
+	}
+	int key = arr[right];//right key值
+	int curr = left;
+	int prev = left-1;
+	while(curr < right){
+		if( arr[curr] < key && ++prev != curr ){
+			swap(arr[prev], arr[curr]);
+		}
+		++curr;
+	}
+	swap(arr[++prev], arr[right]);
+	return prev;
+}
+
 int quick_sort(int arr[], int left, int right)
 {
 	if(left < right){
-		int boundary = partion3(arr, left, right);
+		//int boundary = partion3(arr, left, right);
+		int boundary = partion1(arr, left, right);
         quick_sort(arr, left, boundary-1);
         quick_sort(arr, boundary+1, right);
 	}
 	return 0;
 }
 
+//非递归实现快排
+void quicksort_nonrecursive(int arr[], int left, int right)
+{
+	std::stack<int> _s;
+	_s.push(right); //先右边界, 在左边界
+	_s.push(left);
 
+	int count = 0;
+	while( !_s.empty() ){
+		int start = _s.top();//取出左边界
+		_s.pop();
+		int end  = _s.top();//取出右边界
+		_s.pop();
+		std::cout<<"count : "<<count<<" start : "<<start<<" end : "<<end<<std::endl;
+		count++;
+		if(start < end){
+			//这个过程，其实将以前一个较大的范围，划分成为了两个较小的范围，然后针对每个较小的范围，(较大范围消失，较小范围生成)分而治之
+			int mid = partion3(arr, start, end);
+			_s.push(mid-1);
+			_s.push(start);
+			_s.push(right);
+			_s.push(mid+1);
+		}else{
+			std::cout<<"break! "<<start<<" : "<<end<<std::endl;
+		}
+	}
+}
 
+//快速排序优化：在数据序列较短的时候，用插入排序进行优化
+void quick_sort_op(int arr[], int left, int right)
+{
+	if(left < right){
+		int step = right - left;
+		if(step < 13){
+			insert_sort(arr+left, step + 1);
+		}else{
+	    	int boundary = partion1(arr, left, right);
+            quick_sort_op(arr, left, boundary-1);
+            quick_sort_op(arr, boundary+1, right);
+		}
+	}
+}
 
-
-
-
-
-
-
-
+//归并排序
 
 
 
