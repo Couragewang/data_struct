@@ -316,8 +316,68 @@ void quick_sort_op(int arr[], int left, int right)
 	}
 }
 
-//归并排序
+//src: 源数据
+//dst: 为归并所申请的临时中转空间
+//begin, mid, end: 此次归并的区域，归并［beign， mid) 和 ［mid，end)，两个区域(注意，这两个区域，不一定等长), 并且，begin， mid， end都肯定在src的有效范围之内
+void _merge(int src[], int dst[], int begin, int mid, int end)
+{
+	int begin1 = begin;
+	int end1 = mid;
 
+	int begin2 = mid;
+	int end2 = end;
+
+	int index = 0;//dst中元素的索引
+	while( begin1 < end1 && begin2 < end2 ){
+		//排序小－>大
+		if(src[begin1] < src[begin2]){
+			dst[index++] = src[begin1++];
+		}else{
+			dst[index++] = src[begin2++];
+		}
+	}
+	//归并过程是开始只有两个元素进行归并的（1个数组可以认为有序）
+	//归并后，2个元素依旧有序。所以，后续的多路归并，都是建立在
+	//之前的已序基础之上的,所以后续的处理相对非常简单
+	if(begin1 < end1){
+		memcpy(&dst[index], &src[begin1], (end1-begin1)*sizeof(int));
+	}
+	if(begin2 < end2 ){
+		memcpy(&dst[index], &src[begin2], (end2 - begin2)*sizeof(int));
+	}
+	//待归并的两个区域[begin, mid) 和 [mid, end)必定是在src的某个起始位置连续的
+	memcpy(&src[begin], dst, (end - begin)*sizeof(int));
+}
+
+//归并排序
+void merge_sort(int arr[], int size)
+{
+	int *src = arr;
+	int *dst = new int[size]; //二路归并需要申请独立空间
+
+	int gap = 1;//二路归并， 跨度为1
+	int begin, mid, end;
+	//归并的跨度最大是size/2, 最后一次二路归并
+	while( gap < size ){
+		int div  = 0;
+		for(; div < size; div += 2*gap){
+			begin = div; //每次begin位置必定合理有效
+			mid = div + gap; //二路归并，[begin, mid), 半闭半开区间
+			end = div + 2*gap; //［mid, end), 同上
+
+			if( mid > size ){//有可能越界，需检测 
+				mid = size;
+			}
+			if( end > size ){ //同上
+				end = size;
+			}
+			_merge(src, dst, begin, mid, end);//开始二路归并
+		}
+		gap = 2*gap;
+	}
+
+	delete []dst;
+}
 
 
 
