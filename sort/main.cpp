@@ -16,7 +16,8 @@ int main()
 	//quick_sort(arr, 0, 9);
 	//quick_sort_op(arr, 0, 9);
 	//quicksort_nonrecursive(arr, 0, 9);
-	merge_sort(arr, 10);
+	//merge_sort(arr, 10);
+	//merge_sort_r(arr, 10);
 	show_arr(arr, 10);
 	return 0;
 }

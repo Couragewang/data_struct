@@ -379,6 +379,60 @@ void merge_sort(int arr[], int size)
 	delete []dst;
 }
 
+//归并排序递归
+//对一个区域进行归并递归排序
+void merge_r(int *src, int *dst, int left, int right)
+{
+	if( left < right-1 ){ //需要保证是一个有效的区域，left 不能等于 right, 否则，在最后的_merge中，会memcpy拷贝出问题
+		int mid = left + (right - left)/2;
+		merge_r(src, dst, left, mid);
+		merge_r(src, dst, mid, right);
+		_merge(src, dst, left, mid, right);//开始二路归并
+	}
+}
+
+//归并排序优化
+//当递归到一定程度之后，小区域使用插入排序进行排序
+void merge_r_op(int *src, int *dst, int left, int right)
+{
+	if(left < right){
+		if( right - left < 5 ){
+			insert_sort(src+left, right - left); //当区域长度小于5的时候，使用插入排序进行优化, 减少递归次数
+			return;
+		}
+		int mid = left + (right - left)/2;
+		merge_r_op( src, dst, left, mid );
+		merge_r_op( src, dst, mid, right);
+		_merge(src, dst, left, mid, right);//开始二路归并
+	}
+}
+
+//递归完成归并
+void merge_sort_r(int arr[], int size)
+{
+	int *src = arr;
+	int *dst = new int[size];
+	//merge_r_op(src, dst, 0, size);
+	merge_r(src, dst, 0, size);
+	delete []dst;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
