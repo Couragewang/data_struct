@@ -425,7 +425,6 @@ void merge_sort_r(int arr[], int size)
 //输出数组B：输出数组A的一个非减序列
 //中间数组C：大小K，它的i(0<=i<=k)索引位置存储的是A元素集合和。
 //这里意思是：原始数组A元素变成了中间数组C下标。
-
 void sort_count(int *arr, int size)
 {
 	assert(arr);
@@ -460,26 +459,50 @@ void sort_count(int *arr, int size)
 	delete []count;
 }
 
+int get_max_bits(int *arr, int size)
+{
+	int max_bit = 1; //起初认为序列中都是个位数字
+	int max = 10;//如果有大于十的数字，说明max_bit最少是2
+	for(int i = 0; i < size; ++i){
+		while( arr[i] >= max){ //统计当前元素的位数
+			max *= 10;
+			max_bit++;
+		}
+	}
+	return max_bit;
+}
 
+//基数排序－桶排序
+//最低位优先(Least Significant Digit first)法，简称LSD法
+void radix_sort_LSD(int arr[], int size)
+{
+	//1. 需要获取到数组序列中元素最大数据位数（个十百千...）
+	int max_bits = get_max_bits(arr, size);
+	int *bucket = new int[size]; //桶
+	int *count = new int[10];    //计数器
 
+	memset(bucket, 0, sizeof(int)*size);
 
+	int radix = 1;
+	for(int bit = 1; bit <= max_bits; ++bit){
+		memset(count, 0, sizeof(int)*10);
 
+		//统计指定数据位置（个十百千...）的数据个数
+		for(int i = 0; i < size; ++i){
+			int k = (arr[i]/radix)%10;//计算当前个(十百千，与radix相关)位数据（0-9）
+			count[k]++; //个(十百千，与radix相关)位为k的数据进行累加统计
+		}//统计完成
 
+		//统计出来针对不同的数据位置，数据在桶中的位置范围
+		for(int i = 1; i < size; i++){
+			count[i] = count[i-1]+count[i];
+		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		//将数据放到对应的桶中
+		for(){
+		}
+	}
+}
 
 
 
