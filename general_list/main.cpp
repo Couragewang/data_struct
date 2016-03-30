@@ -3,6 +3,7 @@
 using namespace std;
 int main()
 {
-	cout<<"hello world"<<endl;
+	general_list LS("(1,3,5,(a, b,(c, d), e)");
+	LS.print();
 	return 0;
 }
