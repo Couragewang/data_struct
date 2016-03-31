@@ -120,6 +120,35 @@ class general_list{
 			}
 		}
 
+		general_list_node *_copy(general_list_node *_head) const
+		{
+			general_list_node *new_head = new general_list_node(HEAD_TYPE); //新建一个头节点 
+
+			general_list_node *prev = new_head;
+			general_list_node *_begin = _head->next;
+
+			while(_begin){
+				general_list_node *curr = new general_list_node(); //新建一个节点 
+				//1. 赋予新节点有效内容
+				if( _begin->type == HEAD_TYPE){
+					curr->type = HEAD_TYPE;
+				}else if( _begin->type == VALUE_TYPE ){
+					curr->type = VALUE_TYPE;
+					curr->value = _begin->value;
+				}else{ //SUB_TYPE
+					curr->type = SUB_TYPE;
+					curr->sub_link = _copy(_begin->sub_link);
+				}
+				//2. 连接新节点
+				prev->next = curr;
+				prev = curr;
+
+				//3. 连接下一个节点
+				_begin = _begin->next;
+			}
+			return new_head;
+		}
+
 		void create_list(general_list_node *&_head, const char *&_str) //注意这里的引用类型！
 		{
 			if( *_str++ != '(' ){ //注意，判断完成之后，指向下一个字符
@@ -153,6 +182,17 @@ class general_list{
 			create_list(head, str);
 		}
 
+		general_list(const general_list &_head)
+		{
+			head = _head.copy();
+		}
+
+		const general_list& operator=(general_list g) //此处调用拷贝构造
+		{
+			swap(head, g.head); //更换地址即可
+			return *this;
+		}
+
 		~general_list()
 		{
 			//析构函数, 递归清理广义表
@@ -179,6 +219,11 @@ class general_list{
 		{
 			_print(this->head);
 			cout<<endl;
+		}
+
+		general_list_node *copy() const
+		{
+			return _copy(head);
 		}
 	private:
 		general_list_node *head; //初始头指针
