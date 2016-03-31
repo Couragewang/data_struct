@@ -73,12 +73,51 @@ class general_list{
 			}
 			cout<<')';
 		}
-	public:
-		general_list(const std::string &_str="")
-			:head(NULL)
+
+		//求解广义表的深度，子表个数
+		int _depth(general_list_node *&_head)
 		{
-			const char *str = _str.c_str();
-			create_list(head, str);
+			int depth = 1;
+			general_list_node *_begin = _head;
+			while(_begin){
+				if(_begin->type == SUB_TYPE){
+					int ret = _depth(_begin->sub_link);
+					depth+=ret;
+				}
+				_begin = _begin->next;
+			}
+			return depth;
+		}
+
+		//求广义表数据节点的个数
+		int _size(general_list_node *&_head)
+		{
+			int size = 0;
+			general_list_node *_begin = _head;
+			while(_begin){
+				if(_begin->type == SUB_TYPE){
+					size += _size(_begin->sub_link); //指向下一个子表的头节点, 相同问题，规模变小
+				}else if(_begin->type == VALUE_TYPE){
+					++size;
+				}else{
+					//DO NOTHING
+				}
+				_begin = _begin->next;
+			}
+			return size;
+		}
+
+		void _destroy(general_list_node *&_head)
+		{
+			general_list_node *_begin = _head;
+			while(_begin){
+				general_list_node *del = _begin; //指向当前节点
+				_begin = _begin->next;           //保存下一个节点
+				if( del->type == SUB_TYPE ){
+					_destroy(del->sub_link);
+				}
+				delete del;//删除当前节点
+			}
 		}
 
 		void create_list(general_list_node *&_head, const char *&_str) //注意这里的引用类型！
@@ -105,6 +144,37 @@ class general_list{
 				}
 			}
 		}
+
+	public:
+		general_list(const std::string &_str="")
+			:head(NULL)
+		{
+			const char *str = _str.c_str();
+			create_list(head, str);
+		}
+
+		~general_list()
+		{
+			//析构函数, 递归清理广义表
+			destroy();
+		}
+
+		int depth()
+		{
+			return _depth(head);
+		}
+
+		int size()
+		{
+			return _size(head);
+		}
+
+		void destroy()
+		{
+			_destroy(head);
+			head = NULL;
+		}
+
 		void print()
 		{
 			_print(this->head);
