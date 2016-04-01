@@ -149,6 +149,7 @@ class general_list{
 			return new_head;
 		}
 
+
 		void create_list(general_list_node *&_head, const char *&_str) //注意这里的引用类型！
 		{
 			if( *_str++ != '(' ){ //注意，判断完成之后，指向下一个字符
@@ -163,13 +164,18 @@ class general_list{
 					_begin->next = new general_list_node(SUB_TYPE);
 					_begin = _begin->next;//指向新sub_link节点
 					create_list(_begin->sub_link, _str); //递归建立子表结构 
-				}else if( *_str == ')'){ //该层表结束
-					return;
+					continue;
+				}else if( *_str == ')' ){ //该层表结束
+					++_str;
+					continue;
+	//				return;
 				}else if( is_value(*_str) ){
 					_begin->next = new general_list_node(VALUE_TYPE, *_str++); //数值节点
 					_begin = _begin->next;
+					continue;
 				}else{
 					++_str; //否则，跳过其他与表无关的字符
+					//continue;
 				}
 			}
 		}

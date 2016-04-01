@@ -23,7 +23,8 @@ int main()
 	cout<<"level 3 size : "<<g3.size()<<endl;
 
 	//多层空格嵌套
-	general_list g4("((),(),((),(),((),(,()))))");
+	//general_list g4("((),(),((),(),((),(,()))))");
+	general_list g4("((),())");
 	g4.print();
 	cout<<"level 4 depth : "<<g4.depth()<<endl;
 	cout<<"level 4 size : "<<g4.size()<<endl;
