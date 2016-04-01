@@ -167,8 +167,7 @@ class general_list{
 					continue;
 				}else if( *_str == ')' ){ //该层表结束
 					++_str;
-					continue;
-	//				return;
+					return;
 				}else if( is_value(*_str) ){
 					_begin->next = new general_list_node(VALUE_TYPE, *_str++); //数值节点
 					_begin = _begin->next;
