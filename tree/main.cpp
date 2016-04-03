@@ -8,6 +8,7 @@ int main()
 	mytree.prev_order();
 	mytree.in_order();
 	mytree.post_order();
+	mytree.level_order();
 	cout<<"size: "<<mytree.size()<<endl;
 	cout<<"heigth: "<<mytree.heigth()<<endl;
 

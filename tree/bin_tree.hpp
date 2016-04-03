@@ -2,6 +2,9 @@
 #pragma once
 
 #include <iostream>
+#include <queue>
+#include <stack>
+
 using namespace std;
 
 template<class T>
@@ -44,7 +47,20 @@ class bin_tree{
 			return tmp;
 		}
 
-		//前序遍历二叉树
+		//非递归先顺建立二叉树
+//		bin_tree_node<T> *_create_bin_tree_nr(const T* _arr, const size_t &_size)
+//		{
+//			int i = 0;
+//			bin_tree_node<T> *tmp = NULL;
+//			while( _arr[i] != '\0' ){
+//				if(_arr[i++] != '#'){
+//					continue;
+//				}
+//				tmp = _buy_node(arr[i]);
+//			}
+//		}
+
+		//先序遍历二叉树
 		void _prev_order(bin_tree_node<T> *&_root)
 		{
 			if( NULL == _root ){
@@ -76,6 +92,82 @@ class bin_tree{
 		    _post_order(_root->right_child);
 			visit(_root->data);
 		}
+
+		//层顺遍历二叉树
+		void _level_order()
+		{
+			if( root == NULL ){
+				return;
+			}
+			cout<<"level order: ";
+			queue<bin_tree_node<T>* > node_queue;
+			node_queue.push(root);
+
+			while( !node_queue.empty() ){
+				bin_tree_node<T> *tmp = node_queue.front();
+				if( tmp->left_child ){ //左孩子不为空，左孩子入队列(层序遍历，从左->右)
+					node_queue.push(tmp->left_child);
+				}
+				if( tmp->right_child ){ //右孩子不为空，右孩子入队列 
+					node_queue.push(tmp->right_child);
+				}
+				cout<<tmp->data<<' ';
+				node_queue.pop(); //清除队列首元素
+			}
+			cout<<endl;
+		}
+
+		//非递归实现前中后序遍历
+		void _prev_order_nr(bin_tree_node<T> *&_root)
+		{
+			if(NULL == _root){
+				return;
+			}
+			stack<bin_tree_node<T> *> s;
+			s.push(_root);
+			while( !s.empty() ){
+				bin_tree_node<T> *tmp = s.top(); //取得栈顶元素
+				cout<<tmp->data<<' ';            //访问该节点(前序)
+				s.pop();                         //清理该节点
+				if(tmp->right_child){    //右孩子节点先入栈
+					s.push(tmp->right_child);
+				}
+				if(tmp->left_child){    //左孩子节点后入栈, 栈结构特点决定
+					s.push(tmp->left_child);
+				}
+			}
+			cout<<endl;
+		}
+
+		void _in_order_nr(bin_tree_node<T> *&_root)
+		{
+			if(_root == NULL){
+				return;
+			}
+
+			stack<bin_tree_node<T> *> s;
+			bin_tree_node<T> *curr = _root;
+			while(curr || !s.empty()){ //反面（curr==NULL && s.empty()）
+				//1. 将当前节点的所有左孩子入栈( 模拟中序递归过程 )
+				while(curr){
+					s.push(curr);
+					curr = curr->left_child;
+				}
+				//2. 当栈不为空的时候，拿出栈顶元素，最后一个左孩子节点
+				if( !s.empty() ){
+					bin_tree_node<T> *top = s.top();
+					cout<<top->data<<' '; //访问数据
+					s.pop(); //已经访问，丢弃
+					curr = curr->right_child; //左孩子，父节点都已经访问，开始中序右节点
+				}
+			}
+			cout<<endl;
+		}
+
+		void _post_order_nr(bin_tree_node<T> *&_root)
+		{
+		}
+
 		//清除二叉树
 		void _destroy(bin_tree_node<T> *&_root)
 		{
@@ -133,6 +225,8 @@ class bin_tree{
 			return new_root;
 		}
 
+
+
 	public:
 		//构造函数1
 		bin_tree()
@@ -167,7 +261,9 @@ class bin_tree{
 		void prev_order()
 		{
 			cout<<"prev order: ";
-			_prev_order(root);
+			_prev_order(root); //递归
+			cout<<" : ";
+			_prev_order_nr(root); //非递归 
 			cout<<endl;
 		}
 
@@ -175,6 +271,8 @@ class bin_tree{
 		{
 			cout<<"in order: ";
 			_in_order(root);
+			cout<<" : ";
+			_in_order_nr(root);
 			cout<<endl;
 		}
 
@@ -183,6 +281,11 @@ class bin_tree{
 			cout<<"post order: ";
 			_post_order(root);
 			cout<<endl;
+		}
+
+		void level_order()
+		{
+			_level_order();
 		}
 
 		int size()
