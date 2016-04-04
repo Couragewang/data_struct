@@ -118,6 +118,7 @@ class bin_tree{
 		}
 
 		//非递归实现前中后序遍历
+		//非递归前序，很好理解
 		void _prev_order_nr(bin_tree_node<T> *&_root)
 		{
 			if(NULL == _root){
@@ -139,12 +140,12 @@ class bin_tree{
 			cout<<endl;
 		}
 
+		//非递归中序，较好理解
 		void _in_order_nr(bin_tree_node<T> *&_root)
 		{
 			if(_root == NULL){
 				return;
 			}
-
 			stack<bin_tree_node<T> *> s;
 			bin_tree_node<T> *curr = _root;
 			while(curr || !s.empty()){ //反面（curr==NULL && s.empty()）
@@ -158,7 +159,7 @@ class bin_tree{
 					bin_tree_node<T> *top = s.top();
 					cout<<top->data<<' '; //访问数据
 					s.pop(); //已经访问，丢弃
-					curr = curr->right_child; //左孩子，父节点都已经访问，开始中序右节点
+					curr = top->right_child; //左孩子，父节点都已经访问，开始中序右节点
 				}
 			}
 			cout<<endl;
@@ -166,6 +167,27 @@ class bin_tree{
 
 		void _post_order_nr(bin_tree_node<T> *&_root)
 		{
+			bin_tree_node<T> *curr = _root;
+			bin_tree_node<T> *prev = NULL;
+			stack<bin_tree_node<T> *> s;
+			while( curr || !s.empty() ){
+				//1. 入栈所有左孩子节点
+				while(curr){
+					s.push(curr);
+					curr = curr->left_child;
+				}
+				//2. 拿出栈顶元素，左孩子已经全部访问了的
+				bin_tree_node<T> *top = s.top();
+				//3. 只有当前节点的左右孩子都是NULL 或 左右孩子节点都已经访问过了，才能访问根节点
+				if(top->right_child == NULL || top->right_child == prev){
+					cout<<top->data<<' ';
+					s.pop();
+					prev = top;
+				}else{
+					curr = top->right_child;//将当前需要后序的节点，用curr指向
+				}
+			}
+			cout<<endl;
 		}
 
 		//清除二叉树
@@ -280,6 +302,8 @@ class bin_tree{
 		{
 			cout<<"post order: ";
 			_post_order(root);
+			cout<<" : ";
+			_post_order_nr(root);
 			cout<<endl;
 		}
 
@@ -306,14 +330,5 @@ class bin_tree{
 	public:
 		bin_tree_node<T> *root; //树根 
 };
-
-
-
-
-
-
-
-
-
 
 
