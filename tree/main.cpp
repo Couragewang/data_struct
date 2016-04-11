@@ -29,5 +29,6 @@ int main()
 	cout<<"size: "<<_copy_tree.size()<<endl;
 	cout<<"heigth: "<<_copy_tree.heigth()<<endl;
 
+	bin_tree_p<char> mytree_p(tree, strlen(tree));
 	return 0;
 }

@@ -331,4 +331,56 @@ class bin_tree{
 		bin_tree_node<T> *root; //树根 
 };
 
+//二叉树三叉链结构
+template <class T>
+struct bin_tree_node_p{
+	T data;
+	bin_tree_node_p<T> *left_child;
+	bin_tree_node_p<T> *right_child;
+	bin_tree_node_p<T> *parent;
+
+	bin_tree_node_p(const T &x)
+		:data(x)
+		 ,left_child(NULL)
+		 ,right_child(NULL)
+		 ,parent(NULL)
+	{}
+};
+
+template<class T>
+class bin_tree_p{
+	private:
+		bin_tree_node_p<T>* buy_node(const T &_val)
+		{
+			bin_tree_node_p<T> *tmp = new bin_tree_node_p<T>(_val);
+			return tmp;
+		}
+	public:
+		bin_tree_p(T array[], size_t size)
+		{
+			int index = 0;
+			_create_tree(root, array, size, index);
+		}
+		~bin_tree_p()
+		{}
+	private:
+		//中序建立二叉树
+		void _create_tree(bin_tree_node_p<T>*&root, T array[], size_t size, int &index)
+		{
+			if(index < size && array[index] != '#'){
+				root = buy_node(array[index]); //新建节点
+				_create_tree(root->left_child, array, size, ++index); //创建当前节点的左孩子节点 
+				if(root->left_child){
+					root->left_child->parent = root; //当左孩子不为空时，更新父节点
+				}
+				_create_tree(root->right_child, array, size, ++index);
+				if(root->right_child){
+					root->right_child->parent = root;
+				}
+			}
+		}
+	private:
+		bin_tree_node_p<T> *root;
+};
+
 
