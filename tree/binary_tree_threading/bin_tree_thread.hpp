@@ -43,18 +43,18 @@ class binary_tree_thread{
 		binary_tree_thread(T array[], size_t size)
 		{
 			int index = 0;
-			_create_three(root, array, size, index);
+			_create_tree(root, array, size, index);
 		}
-		~binary_tree_thead()
+		~binary_tree_thread()
 		{}
 	private:
 		binary_tree_thread_node<T> *buy_node(T val)
 		{
-			binary_tree_thread_node<T> *tmp = new binary_tree_thead_node<T>(val);
+			binary_tree_thread_node<T> *tmp = new binary_tree_thread_node<T>(val);
 			return tmp;
 		}
 
-		_create_tree(binary_tree_thread_node<T> *&root, T array[], size_t size, int &index)
+		void _create_tree(binary_tree_thread_node<T> *&root, T array[], size_t size, int &index)
 		{
 			if(index < size && array[index] != '#'){
 		    	root = buy_node(array[index]);
@@ -66,12 +66,11 @@ class binary_tree_thread{
 				if(root->right_child){
 					root->left_child->father = root;
 				}
-
 			}
 		}
 
 		//中序线索化 : 线索化的过程，是需要查找节点的前驱和后继的，而在二叉树中，找节点的前驱后继，需要在遍历中做到
-		_in_threading(binary_tree_thread_node<T> *curr, binary_tree_thread_node<T> *&prev)
+		void _in_threading(binary_tree_thread_node<T> *curr, binary_tree_thread_node<T> *&prev)
 		{
 			if(curr){
 				_in_threading(curr->left_child, prev);
@@ -91,10 +90,10 @@ class binary_tree_thread{
 		}
 
 		//前序线索化
-		_prev_threading()
+		void _prev_threading()
 		{}
 		//后序线索化
-		_post_threading()
+		void _post_threading()
 		{}
 	private:
 		binary_tree_thread_node<T> *root;
