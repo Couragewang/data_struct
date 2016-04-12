@@ -45,6 +45,25 @@ class binary_tree_thread{
 			int index = 0;
 			_create_tree(root, array, size, index);
 		}
+
+		void in_threading()
+		{
+			binary_tree_thread_node<T> *prev = NULL;
+			_in_threading(root, prev);
+		}
+
+		void prev_threading()
+		{
+			binary_tree_thread_node<T> *prev = NULL;
+			_prev_threading(root, prev);
+		}
+
+		void post_threading()
+		{
+			binary_tree_thread_node<T> *prev = NULL;
+			_post_threading(root, prev);
+		}
+
 		~binary_tree_thread()
 		{}
 	private:
@@ -90,17 +109,70 @@ class binary_tree_thread{
 		}
 
 		//前序线索化
-		void _prev_threading()
-		{}
+		void _prev_threading(binary_tree_thread_node<T> *curr, binary_tree_thread_node<T> *&prev)
+		{
+			if( curr ){
+				//1. 站在当前节点的角度, prev作为前驱节点，如果可以，被当前节点的左子树指向
+				if( curr->left_child == NULL ){
+					curr->left_tag = THREAD;
+					curr->left_child = prev;
+				}
+				//2. 站在前驱节点的角度，curr是prev的后继
+				if(prev && prev->right_child == NULL){
+					prev->right_tag = THREAD;
+					prev->right_child = curr;
+				}
+
+				prev = curr;
+
+				//3. 只有当前节点left或right是LINK, 才需要递归线索化
+				if( curr->left_tag == LINK ){
+					_prev_threading(curr->left_child, prev);
+				}
+
+				//4. 同上
+				if( curr->right_tag == LINK ){
+					_prev_threading(curr->right_child, prev);
+				}
+			}
+		}
 		//后序线索化
-		void _post_threading()
-		{}
+		void _post_threading(binary_tree_thread_node<T> *curr, binary_tree_thread_node<T> *&prev)
+		{
+			if( curr ){
+				if( curr->left_tag  == LINK ){
+					//左孩子是数据节点
+					_post_threading( curr->left_child, prev );
+				}
+				if( curr->right_tag == LINK ){
+					_post_threading( curr->right_child, prev );
+				}
+				if( curr->left_child == NULL ){
+					curr->left_tag = THREAD;
+					curr->left_child = prev;
+				}
+				if(prev && prev->right_child == NULL){
+					prev->right_tag = THREAD;
+					prev->right_child = curr;
+				}
+				prev = curr;
+			}
+		}
+
+		//前序遍历
+		_prev_order()
+		{
+
+		}
+	
+
+		//中序遍历
+		_in_order();
+		//后序遍历
+		_post_order();
 	private:
 		binary_tree_thread_node<T> *root;
 };
-
-
-
 
 
 
