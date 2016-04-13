@@ -64,6 +64,13 @@ class binary_tree_thread{
 			_post_threading(root, prev);
 		}
 
+		void in_order()
+		{
+			cout<<"in order : ";
+			_in_order(root);
+			cout<<endl;
+		}
+
 		~binary_tree_thread()
 		{}
 	private:
@@ -99,7 +106,7 @@ class binary_tree_thread{
 					curr->left_child = prev;
 				}
 				//站在前驱节点的角度，curr是prev的后继
-				if( prev && prev->right == NULL ){
+				if( prev && prev->right_child == NULL ){
 					prev->right_tag = THREAD;
 					prev->right_child = curr; //右孩子指向后继节点
 				}
@@ -160,16 +167,33 @@ class binary_tree_thread{
 		}
 
 		//前序遍历
-		_prev_order()
+		void _prev_order()
 		{
 
 		}
-	
 
-		//中序遍历
-		_in_order();
+		//中序遍历: 左 －》 中 －》 右 
+		//与中序线索化相对应
+		void _in_order(binary_tree_thread_node<T> *curr)
+		{
+			while(curr){
+				while(curr && curr->left_tag == LINK){//1. 先找到最左节点，为第一个要访问的节点
+					curr = curr->left_child;
+				}
+				cout<<curr->data<<" "; //2. 访问他
+				while(curr->right_tag == THREAD && curr->right_child){ //3. 当前节点的后继节点（中序遍历的后继节点）, 考虑单左分支情况，和左子树为满二叉的情况
+					curr = curr->right_child;
+					cout<<curr->data<<" ";
+				}
+				//4. 左分支访问完毕，访问右分支
+				curr = curr->right_child;
+			}
+		}
 		//后序遍历
-		_post_order();
+		void _post_order()
+		{
+
+		}
 	private:
 		binary_tree_thread_node<T> *root;
 };
