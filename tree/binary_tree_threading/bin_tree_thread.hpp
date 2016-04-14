@@ -33,7 +33,6 @@ struct binary_tree_thread_node{
 	{}
 };
 
-
 template<class T>
 class binary_tree_thread{
 	public:
@@ -70,6 +69,14 @@ class binary_tree_thread{
 			_in_order(root);
 			cout<<endl;
 		}
+
+		void prev_order()
+		{
+			cout<<"prev order : ";
+			_prev_order(root);
+			cout<<endl;
+		}
+
 
 		~binary_tree_thread()
 		{}
@@ -166,10 +173,32 @@ class binary_tree_thread{
 			}
 		}
 
-		//前序遍历
-		void _prev_order()
+		//前序遍历 : 中 －》 左 －》 右
+		void _prev_order(binary_tree_thread_node<T> *curr)
 		{
-
+			while(curr){
+				while(curr){
+					cout<<curr->data<<" "; //1. 只要不为空，就直接访问该节点
+					if( curr->left_tag == THREAD){ //2. 如果后序节点是索引，在访问该节点之后，直接跳出
+						break;
+					}
+					curr = curr->left_child;//3. 否则直接指向左子树
+				}
+				curr = curr->right_child; //4. 只要到了这一步，cur直接指向其后继节点
+			}
+		//	while(curr){
+		//		while(curr && curr->left_tag == LINK){//1. 先找到最左节点，为第一个要访问的节点
+		//			cout<<curr->data<<" "; //2. 访问他
+		//			curr = curr->left_child;
+		//		}
+		//		cout<<curr->data<<" ";
+		//		while(curr->right_tag == THREAD && curr->right_child){ //3. 当前节点的后继节点（中序遍历的后继节点）, 考虑单左分支情况，和左子树为满二叉的情况
+		//			curr = curr->right_child;
+		//			cout<<curr->data<<" ";
+		//		}
+		//		//4. 左分支访问完毕，访问右分支
+		//		curr = curr->right_child;
+		//	}
 		}
 
 		//中序遍历: 左 －》 中 －》 右 
@@ -189,6 +218,7 @@ class binary_tree_thread{
 				curr = curr->right_child;
 			}
 		}
+
 		//后序遍历
 		void _post_order()
 		{
