@@ -219,10 +219,34 @@ class binary_tree_thread{
 			}
 		}
 
-		//后序遍历
-		void _post_order()
+		//后序遍历 : 左 －》右 －》中
+		void _post_order(binary_tree_thread_node<T> *_root)
 		{
+			//后序遍历不能从根节点开始遍历，因为根节点是后序中最后一个访问的。
+			binary_tree_thread_node<T> *curr = NULL;
+			if( _root && _root->left_child ){
+				 curr = _root->left_child;
+			}
+			while( curr ){
+				//1.找到相对于当前curr节点的最左节点
+				while( curr && curr->left_tag == LINK ){
+					curr = curr->left_child;
+				}
+				//2. 此时，curr的left_tag必须是THREAD
+				//满足如下条件的节点，肯定是叶子节点,或者左分支已经被访问过了
+				while(curr && curr->right_tag == THREAD){ //必须把左子树访问完毕，才能访问右子树，所以相对于最初的curr，他的左分支可能也是一棵树
+					cout<<curr->data<<" ";
+					curr = curr->right_child;
+				}
+				if( curr == _root ){
+					cout<<curr->data<<" ";
+					break;
+				}
 
+
+				cout<<p->data<<" ";
+
+			}
 		}
 	private:
 		binary_tree_thread_node<T> *root;
