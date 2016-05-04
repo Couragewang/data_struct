@@ -20,7 +20,7 @@ struct binary_tree_thread_node{
 	T data;
 	binary_tree_thread_node<T> *left_child;
 	binary_tree_thread_node<T> *right_child;
-	binary_tree_thread_node<T> *father; //后序遍历？
+	binary_tree_thread_node<T> *father; //后序遍历
 	pointer_tag left_tag;
 	pointer_tag right_tag;
 
@@ -74,6 +74,13 @@ class binary_tree_thread{
 		{
 			cout<<"prev order : ";
 			_prev_order(root);
+			cout<<endl;
+		}
+
+		void post_order()
+		{
+			cout<<"post order : ";
+			_post_order(root);
 			cout<<endl;
 		}
 
@@ -220,10 +227,13 @@ class binary_tree_thread{
 		}
 
 		//后序遍历 : 左 －》右 －》中
+		//已经经过后序线索化
 		void _post_order(binary_tree_thread_node<T> *_root)
 		{
 			//后序遍历不能从根节点开始遍历，因为根节点是后序中最后一个访问的。
 			binary_tree_thread_node<T> *curr = NULL;
+			binary_tree_thread_node<T> *prev = NULL;
+
 			if( _root && _root->left_child ){
 				 curr = _root->left_child;
 			}
@@ -236,16 +246,24 @@ class binary_tree_thread{
 				//满足如下条件的节点，肯定是叶子节点,或者左分支已经被访问过了
 				while(curr && curr->right_tag == THREAD){ //必须把左子树访问完毕，才能访问右子树，所以相对于最初的curr，他的左分支可能也是一棵树
 					cout<<curr->data<<" ";
+					prev = curr;
 					curr = curr->right_child;
 				}
+				//有可能通过线索查找，到了最后的root节点，访问退出即可
 				if( curr == _root ){
 					cout<<curr->data<<" ";
 					break;
 				}
+				//如果左右节点都已经访问，并且当前节点没有线索，说明包含curr节点的子树已经全部访问完毕，回退到curr的父节点(画图了解更清晰)
+				while(curr && curr->right_child == prev){
+					cout<<curr->data<<" ";
+					prev = curr;
+					curr = curr->father;
+				}
 
-
-				cout<<p->data<<" ";
-
+				if(curr && curr->right_tag == LINK){
+					curr = curr->right_child;
+				}
 			}
 		}
 	private:
