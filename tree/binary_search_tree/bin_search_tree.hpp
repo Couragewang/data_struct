@@ -1,4 +1,6 @@
 #pragma once
+
+#include <iostream>
 //二叉查找树
 //(1)左子树不空，则左子树上的所有结点的值均小于根结点的值
 //(2)右子树不空，则右子树上的所有结点的值均大于根结点的值
@@ -25,9 +27,9 @@ class bs_tree{
 private:
 	typedef bst_node<K, V> node_t, *node_p;
 
-	node_t buy_node(const K &_key, const V &_val)
+	node_p buy_node(const K &_key, const V &_val)
 	{
-		node_t tmp = new node_t(_key, _val);
+		node_p tmp = new node_t(_key, _val);
 		return tmp;
 	}
 
@@ -146,6 +148,7 @@ public:
 	{
 		return _in_order(root);
 	}
+
 private:
 	node_p root;
 };
