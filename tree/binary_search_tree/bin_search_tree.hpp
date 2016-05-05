@@ -108,6 +108,15 @@ private:
 		return NULL;
 	}
 
+	//中序遍历是一个有序序列, 左－》中－》右
+	void _in_order(const node_p &_root)
+	{
+		if( _root ){
+			_in_order(_root->left);
+			std::cout<<"[ "<<_root->key<<":"<<_root->val<<" ], ";
+			_in_order(_root->right);
+		}
+	}
 public:
 	bs_tree()
 		:root(NULL)
@@ -133,7 +142,10 @@ public:
 	{
 		return _find_NR(root, _key);
 	}
-
+	void in_order()
+	{
+		return _in_order(root);
+	}
 private:
 	node_p root;
 };
