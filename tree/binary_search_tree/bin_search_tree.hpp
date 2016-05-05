@@ -47,7 +47,6 @@ private:
 			}
 		}
 	}
-
 	//非递归插入，搜索二叉插入，总能插入到一个叶子节点后面
 	bool _insert_NR(node_p &_root, const K &_key, const V &_val)
 	{
@@ -71,13 +70,44 @@ private:
 		//curr定然为空，prev指向最后一个有效节点，当前节点插入prev的left或right
 		if( _key > prev->key){ //右子树
 			prev->right = buy_node(_key, _val);
-			return true;
 		}else if( _key < prev->key){//左子树
 			prev->left = buy_node(_key, _val);
-			return true;
+		}else{
+			return false;
 		}
-		return false;
+		return true;
 	}
+	//递归查找 
+	node_p _find_R(const node_p &_root, const K &_key)
+	{
+		if(_root){
+			if( _key < _root->key ){//key值小于当前的值，在左子树进行查找
+				return _find_R(_root->left, _key);
+			}else if( _key > _root->key ){//key值大于当前的值，在右子树进行查找 
+				return _find_R(_root->right, _key);
+			}else{
+				return _root;
+			}
+		}
+		//查找到_root为空，必定没有找到
+		return NULL;
+	}
+	//非递归查找
+	node_p _find_NR(const node_p &_root, const K &_key)
+	{
+		node_p curr = _root;
+		while( curr ){
+			if( _key < curr->key ){
+				curr = curr->left;
+			}else if( _key > curr->key ){
+				curr = curr->right;
+			}else{
+				return curr;
+			}
+		}
+		return NULL;
+	}
+
 public:
 	bs_tree()
 		:root(NULL)
@@ -95,6 +125,15 @@ public:
 	{
 		return _insert_NR(root, _key, _val);
 	}
+	node_p find_R(const K &_key)
+	{
+		return _find_R(root, _key);
+	}
+	node_p find_NR(const K &_key)
+	{
+		return _find_NR(root, _key);
+	}
+
 private:
 	node_p root;
 };
