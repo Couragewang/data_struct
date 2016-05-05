@@ -41,9 +41,9 @@ private:
 			return true;
 		}else{
 			if(_key < _root->key){//带插节点key小于当前节点值,插入当前节点左侧
-				return _insert(_root->left, _key, _val);
+				return _insert_R(_root->left, _key, _val);
 			}else if( _key > _root->key){
-				return _insert(_root->right, _key, _val);
+				return _insert_R(_root->right, _key, _val);
 			}else{
 				return false;
 			}
@@ -115,7 +115,7 @@ private:
 	{
 		if( _root ){
 			_in_order(_root->left);
-			std::cout<<"[ "<<_root->key<<":"<<_root->val<<" ], ";
+			std::cout<<"[ "<<_root->key<<":"<<" '"<<_root->val<<" '"<<" ] ";
 			_in_order(_root->right);
 		}
 	}
@@ -146,7 +146,8 @@ public:
 	}
 	void in_order()
 	{
-		return _in_order(root);
+		_in_order(root);
+		std::cout<<std::endl;
 	}
 
 private:
