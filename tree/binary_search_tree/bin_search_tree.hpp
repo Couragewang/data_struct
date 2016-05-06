@@ -141,7 +141,7 @@ private:
 	//1. 欲删除的节点是叶子节点，没有左右子树，这种情况最简单，直接删除节点
 	//2. 欲删除的节点非叶子节点，但只有左子树或者右子树。
 	//3. 欲删除的节点非叶子节点，并且包含有左子树和右子树
-	bool _remove(node_p &_root, const K &_key)
+	bool _remove_NR(node_p &_root, const K &_key)
 	{
 		if( NULL == _root ){
 			return false;
@@ -222,6 +222,33 @@ private:
 		}
 		return true;
 	}
+	bool _remove_R(node_p &_root, const K &_key)
+	{
+		if( _root ){
+			if( _key < _root->key ){
+				return _remove_R(_root->left); //键值小于root key, 在左子树中删除
+			}else if(_key > _root->key){
+				return _remove_R(_root->right);
+			}else{ //找到对应的节点, 进行删除
+			    //1. 欲删除的节点是叶子节点，没有左右子树，这种情况最简单，直接删除节点
+			    if( NULL == _root->left && NULL == _root->right ){
+			    	if(_root->left == del){
+			    		_root->left = NULL;
+			    	}else{
+			    		_root->right = NULL;
+			    	}
+			    	delete_node(del);
+			    	return true;
+			    }
+
+				if( _root->left == NULL ){
+				}else if( _root->right == NULL ){
+				}else{
+				}
+			}
+		}
+	}
+
 public:
 	bs_tree()
 		:root(NULL)
@@ -255,15 +282,9 @@ public:
 	//删除节点
 	bool remove(const K &_key)
 	{
-		return _remove(root, _key);
+		return _remove_NR(root, _key);
 	}
 private:
 	node_p root;
 };
-
-
-
-
-
-
 
