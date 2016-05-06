@@ -20,5 +20,19 @@ int main()
 	_bs.insert_R(1, 'i');
 	_bs.insert_R(9, 'p');
 	_bs.in_order();
+	_bs.remove(5);
+	_bs.in_order();
+	_bs.remove(0);
+	_bs.in_order();
+	_bs.remove(8);
+	_bs.in_order();
+	_bs.remove(9);
+	_bs.in_order();
+	_bs.remove(1);
+	_bs.in_order();
+	_bs.remove(2);
+	_bs.in_order();
+	_bs.remove(6);
+	_bs.in_order();
 	return 0;
 }
