@@ -226,27 +226,36 @@ private:
 	{
 		if( _root ){
 			if( _key < _root->key ){
-				return _remove_R(_root->left); //键值小于root key, 在左子树中删除
+				return _remove_R(_root->left, _key); //键值小于root key, 在左子树中删除
 			}else if(_key > _root->key){
-				return _remove_R(_root->right);
+				return _remove_R(_root->right, _key);
 			}else{ //找到对应的节点, 进行删除
+				node_p del = NULL;
 			    //1. 欲删除的节点是叶子节点，没有左右子树，这种情况最简单，直接删除节点
-			    if( NULL == _root->left && NULL == _root->right ){
-			    	if(_root->left == del){
-			    		_root->left = NULL;
-			    	}else{
-			    		_root->right = NULL;
-			    	}
-			    	delete_node(del);
-			    	return true;
-			    }
-
+				//2. 如果左or右子树为空，则用一个子树进行填补。
+				//3. 如果左右均不为空，则使用右子树中序的第一个节点填补
 				if( _root->left == NULL ){
+					del = _root;
+					_root = _root->right;
+					delete_node(del);
 				}else if( _root->right == NULL ){
+					del = _root;
+					_root = _root->left;
+					delete_node(del);
 				}else{
+					node_p right_first = _root->right;
+					//查找_root中序的最左节点,或查找右子树的中序遍历的第一个节点
+					while(right_first->left){
+						right_first = right_first->left;
+					}
+					swap(_root->val, right_first->val);
+					swap(_root->key, right_first->key);
+					_remove_R(_root->right, right_first->key);
 				}
+				return true;
 			}
 		}
+		return false;
 	}
 
 public:
@@ -280,9 +289,14 @@ public:
 		std::cout<<std::endl;
 	}
 	//删除节点
-	bool remove(const K &_key)
+	bool remove_NR(const K &_key)
 	{
 		return _remove_NR(root, _key);
+	}
+	//递归删除节点
+	bool remove_R(const K &_key)
+	{
+		return _remove_R(root, _key);
 	}
 private:
 	node_p root;
