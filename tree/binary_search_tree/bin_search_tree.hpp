@@ -258,12 +258,23 @@ private:
 		return false;
 	}
 
+	void _destroy(node_p &_root)
+	{
+		if( _root ){
+			_destroy( _root->left );
+			_destroy( _root->right );
+			delete _root;
+			_root = NULL;
+		}
+	}
 public:
 	bs_tree()
 		:root(NULL)
 	{}
 	~bs_tree()
-	{}
+	{
+		_destroy(root);
+	}
 	bs_tree(const bs_tree &tmp);
 	bs_tree& operator=(const bs_tree &tmp);
 public:
