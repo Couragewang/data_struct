@@ -51,5 +51,14 @@ int main()
 	_vec.pop_back();
 	cout<<val<<endl;
 	show_vec(_vec);
+	sort_heap(_vec.begin(), _vec.end(), cmp);
+	//sort_heap(_vec.begin(), _vec.end());
+	show_vec(_vec);
 	return 0;
 }
+
+
+
+
+
+
