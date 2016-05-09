@@ -1,6 +1,6 @@
-haffman_tree:main.cpp
-	g++ -o $@ $^
+huffman_tree:main.cpp
+	g++ -o $@ $^ #-D_DEBUG_
 .PHONY:clean
 
 clean:
-	rm -rf haffman_tree
+	rm -rf huffman_tree
