@@ -32,10 +32,19 @@ int main()
 	std::vector<int> _vec(arr, arr+len);
 	show_vec(_vec);
 #endif
+
 	huffman_tree<int> _tree;
+#ifdef _BINARY_
+	cout<<"binary huffman tree: "<<endl;
 	_tree.create_huffman_tree(arr, len, -1);
 	cout<<"level_order: ";
 	_tree.level_order();
+#elif _STATIC_
+	cout<<"static huffman tree: "<<endl;
+	_tree.create_huffman_tree(arr, len);
+	cout<<"level_order: ";
+	_tree.level_order();
+#endif
 	//堆相关函数的测试
 //	int a[]={1,2,3,4,5,6,8,9,0,23,4};
 //	int len = sizeof(a)/sizeof(a[0])-1;
