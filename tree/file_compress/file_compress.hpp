@@ -48,7 +48,7 @@ struct uchar_info{
 
 std::ostream& operator<<(std::ostream &os, const uchar_info &_info)
 {
-	os<<_info.ch<<" : "<<_info.appear_count<<std::endl;;
+	os<<_info.ch<<":"<<_info.appear_count<<std::endl;;
 	return os;
 }
 
@@ -111,12 +111,18 @@ class file_compress{
 			return count;
 		}
 
-	public:
-		file_compress()
+		void init()
 		{
 			for( int i = 0; i < 256; ++i ){
 				file_infos[i].ch = i;
+				file_infos[i].appear_count = 0;
 			}
+		}
+
+	public:
+		file_compress()
+		{
+			init();
 		}
 
 		bool compress(const std::string &file_name)
@@ -230,6 +236,7 @@ class file_compress{
 
 		bool uncompress(const std::string &file_name)
 		{
+			init();
 			std::string config_file = file_name;
 			config_file += ".config";
 			FILE *fconf = fopen(config_file.c_str(), "rb");
@@ -252,16 +259,20 @@ class file_compress{
 				}
 				ch = _line[0];
 				string_to_type(_line.substr(2), file_infos[ch].appear_count);
-				std::cout<<ch<<" : "<<_line.substr(2)<<std::endl;
+				std::cout<<"======================="<<std::endl;
+				std::cout<<ch<<":"<<file_infos[ch].appear_count<<std::endl;
+				std::cout<<"======================="<<std::endl;
 			}
 			fclose(fconf);
 
-			//3. 根据字符出现的次数，构建huffman树, 并生成huffman code
+			//3. 根据字符出现的次数，构建huffman树
 			huffman_tree<uchar_info> _tree;
 			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
 			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
 
+			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
 			_tree.level_order();
+			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
 
 			//4. 打开目标解压文件和原始压缩文件
 			std::string uncompress_file = file_name;
@@ -294,18 +305,14 @@ class file_compress{
 			//}
 			////将整个文件读进内存
 			//fread(file_p, 1, file_size, fin);
+
+	//		uchar_count = 1;
 			int index = 0;
 			int pos = 8;
 			ch = fgetc(fin);
 			while(1){
 				--pos;
-				if( pos < 0 ){
-					printf("AAAAA\n");
-					pos = 8;
-					ch = fgetc(fin);
-					continue;
-				}
-				if( ch && (1<<pos) ){
+				if( ch & (1<<pos) ){
 					curr = curr->right;
 				}else{
 					curr = curr->left;
@@ -314,9 +321,14 @@ class file_compress{
 					fputc(curr->weight.ch, fout);
 					std::cout<<"debug : "<<curr->weight.ch<<std::endl;
 					curr = root;
-					if( uchar_count-- == 0 ){
+					if( --uchar_count == 0 ){
 						break;
 					}
+				}
+				if( pos < 0 ){
+					pos = 8;
+					ch = fgetc(fin);
+					continue;
 				}
 			}
 
@@ -331,22 +343,4 @@ class file_compress{
 	private:
 		uchar_info file_infos[256]; //对于我们的压缩，是按照8比特来进行处理的,所以最多有256种
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
