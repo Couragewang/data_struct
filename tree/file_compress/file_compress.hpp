@@ -46,6 +46,12 @@ struct uchar_info{
 	}
 };
 
+std::ostream& operator<<(std::ostream &os, const uchar_info &_info)
+{
+	os<<_info.ch<<" : "<<_info.appear_count<<std::endl;;
+	return os;
+}
+
 //2. 文件压缩类
 class file_compress{
 	private:
@@ -246,6 +252,7 @@ class file_compress{
 				}
 				ch = _line[0];
 				string_to_type(_line.substr(2), file_infos[ch].appear_count);
+				std::cout<<ch<<" : "<<_line.substr(2)<<std::endl;
 			}
 			fclose(fconf);
 
@@ -253,6 +260,8 @@ class file_compress{
 			huffman_tree<uchar_info> _tree;
 			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
 			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
+
+			_tree.level_order();
 
 			//4. 打开目标解压文件和原始压缩文件
 			std::string uncompress_file = file_name;
@@ -263,7 +272,7 @@ class file_compress{
 				return false;
 			}
 			std::string compress_file = file_name;
-			uncompress_file += ".compress";
+			compress_file += ".compress";
 			FILE *fin = fopen(compress_file.c_str(), "rb");
 			if( NULL == fin ){
 				std::cerr<<strerror(errno)<<std::endl;
@@ -290,6 +299,12 @@ class file_compress{
 			ch = fgetc(fin);
 			while(1){
 				--pos;
+				if( pos < 0 ){
+					printf("AAAAA\n");
+					pos = 8;
+					ch = fgetc(fin);
+					continue;
+				}
 				if( ch && (1<<pos) ){
 					curr = curr->right;
 				}else{
@@ -297,14 +312,11 @@ class file_compress{
 				}
 				if(curr && curr->left == NULL && curr->right == NULL){
 					fputc(curr->weight.ch, fout);
+					std::cout<<"debug : "<<curr->weight.ch<<std::endl;
 					curr = root;
 					if( uchar_count-- == 0 ){
 						break;
 					}
-				}
-				if( pos == 0 ){
-					pos = 8;
-					ch = fgetc(fin);
 				}
 			}
 
