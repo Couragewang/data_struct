@@ -1,8 +1,25 @@
 #pragma once
-
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <assert.h>
 #include "huffman_tree.hpp"
+
+template<class T>
+void type_to_string(const T _val, std::string &_str_res)
+{
+	std::stringstream ss;
+	ss<<_val;
+	ss>>_str_res;
+}
+
+template<class T>
+void string_to_type(const std::string _str, T &_val_res)
+{
+	std::stringstream ss;
+	ss<<_str;
+	ss>>_val_res;
+}
 
 typedef long long_type;
 
@@ -68,6 +85,26 @@ class file_compress{
 				}
 			}
 		}
+
+		//读取配置文件，肯定是普通文本文件
+		int read_line(FILE *fconf, std::string &line)
+		{
+			assert(fconf);
+			char ch;
+			
+			line = "";
+			int count = 0;
+			do{
+				ch = fgetc(fconf);
+				if( ch == EOF ){
+					break;
+				}
+				line += ch;
+				count++;
+			}while( ch != '\n' );
+			return count;
+		}
+
 	public:
 		file_compress()
 		{
@@ -149,11 +186,134 @@ class file_compress{
 				fclose(fout);
 				return false;
 			}
+			
+			//uchar_count;
+			std::string config_str;
+			type_to_string(uchar_count, config_str); //long long 型变量提取高32位
+			fputs(config_str.c_str(), fconf);
+			fputc('\n', fconf);
+//			std::string config_str;
+//			type_to_string(uchar_count>>32, config_str); //long long 型变量提取高32位
+//			fputs(config_str.c_str(), fconf);
+//			fputc('\n', fconf);
+//
+//			config_str="";
+//			type_to_string(uchar_count&0xffffffff, config_str); //long long 型变量提取低32位
+//			fputs(config_str.c_str(), fconf);
+//			fputc('\n', fconf);
+
+			config_str="";
+			std::string _count;
+			for(int i = 0; i < 256; ++i ){
+				if(file_infos[i] != invalid){ //当前字符已经经过编码，为有效节点
+					_count="";
+					config_str = file_infos[i].ch;
+					config_str += ',';
+					type_to_string(file_infos[i].appear_count, _count);
+					config_str += _count;
+					config_str +='\n';
+					fputs(config_str.c_str(), fconf);
+				}
+			}
+
 			fclose(fin);
 			fclose(fout);
 			fclose(fconf);
 			return true;
 		}
+
+		bool uncompress(const std::string &file_name)
+		{
+			std::string config_file = file_name;
+			config_file += ".config";
+			FILE *fconf = fopen(config_file.c_str(), "rb");
+			if( NULL == fconf ){
+				std::cerr<<strerror(errno)<<std::endl;
+				return false;
+			}
+
+			long long uchar_count; //读取原文件中字符的个数
+			std::string _line;
+			unsigned char ch;
+			read_line(fconf, _line);
+			string_to_type(_line, uchar_count);
+
+			while( read_line(fconf, _line) ){
+				if ( _line == "\n" ){
+					std::string _next_line;
+					read_line(fconf, _next_line);
+					_line += _next_line;
+				}
+				ch = _line[0];
+				string_to_type(_line.substr(2), file_infos[ch].appear_count);
+			}
+			fclose(fconf);
+
+			//3. 根据字符出现的次数，构建huffman树, 并生成huffman code
+			huffman_tree<uchar_info> _tree;
+			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
+			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
+
+			//4. 打开目标解压文件和原始压缩文件
+			std::string uncompress_file = file_name;
+			uncompress_file += ".uncompress";
+			FILE *fout = fopen(uncompress_file.c_str(), "wb");
+			if( NULL == fout ){
+				std::cerr<<strerror(errno)<<std::endl;
+				return false;
+			}
+			std::string compress_file = file_name;
+			uncompress_file += ".compress";
+			FILE *fin = fopen(compress_file.c_str(), "rb");
+			if( NULL == fin ){
+				std::cerr<<strerror(errno)<<std::endl;
+				fclose(fout);
+				return false;
+			}
+
+			//5. 开始解压
+			//根据压缩文件字符编码再Huffman树中寻找对应的字符
+			huffman_node<uchar_info> *root = _tree.get_root();
+			huffman_node<uchar_info> *curr = root;
+
+			//fseek(fin, 0, SEEK_END);//定位文件结尾
+			//int file_size = ftell(fin);
+			//fseek(fin, 0, SEEK_SET);
+
+			//if(file_size > 0){
+			//	unsigned char *file_p = new unsigned char[file_size+1];
+			//}
+			////将整个文件读进内存
+			//fread(file_p, 1, file_size, fin);
+			int index = 0;
+			int pos = 8;
+			ch = fgetc(fin);
+			while(1){
+				--pos;
+				if( ch && (1<<pos) ){
+					curr = curr->right;
+				}else{
+					curr = curr->left;
+				}
+				if(curr && curr->left == NULL && curr->right == NULL){
+					fputc(curr->weight.ch, fout);
+					curr = root;
+					if( uchar_count-- == 0 ){
+						break;
+					}
+				}
+				if( pos == 0 ){
+					pos = 8;
+					ch = fgetc(fin);
+				}
+			}
+
+			fclose(fin);
+			fclose(fout);
+			//delete[]file_p;
+			return true;
+		}
+
 		~file_compress()
 		{}
 	private:
