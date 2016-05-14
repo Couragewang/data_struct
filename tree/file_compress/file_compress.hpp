@@ -102,9 +102,14 @@ class file_compress{
 			int count = 0;
 			do{
 				ch = fgetc(fconf);
-				if( ch == EOF ){
+			//	if( ch == EOF ){
+			//		break;
+			//	}
+
+				if( feof(fconf) ){ //到达文件结尾
 					break;
 				}
+
 				line += ch;
 				count++;
 			}while( ch != '\n' );
@@ -248,8 +253,11 @@ class file_compress{
 			long long uchar_count; //读取原文件中字符的个数
 			std::string _line;
 			unsigned char ch;
+			//char ch;
 			read_line(fconf, _line);
 			string_to_type(_line, uchar_count);
+
+			std::cout<<"debug: total size : "<<uchar_count<<std::endl;
 
 			while( read_line(fconf, _line) ){
 				if ( _line == "\n" ){
@@ -259,9 +267,9 @@ class file_compress{
 				}
 				ch = _line[0];
 				string_to_type(_line.substr(2), file_infos[ch].appear_count);
-				std::cout<<"======================="<<std::endl;
-				std::cout<<ch<<":"<<file_infos[ch].appear_count<<std::endl;
-				std::cout<<"======================="<<std::endl;
+//				std::cout<<"======================="<<std::endl;
+//				std::cout<<ch<<":"<<file_infos[ch].appear_count<<std::endl;
+//				std::cout<<"======================="<<std::endl;
 			}
 			fclose(fconf);
 
@@ -270,24 +278,24 @@ class file_compress{
 			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
 			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
 
-			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
-			_tree.level_order();
-			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
+//			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
+//			_tree.level_order();
+//			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
 
 			//4. 打开目标解压文件和原始压缩文件
-			std::string uncompress_file = file_name;
-			uncompress_file += ".uncompress";
-			FILE *fout = fopen(uncompress_file.c_str(), "wb");
-			if( NULL == fout ){
-				std::cerr<<strerror(errno)<<std::endl;
-				return false;
-			}
 			std::string compress_file = file_name;
 			compress_file += ".compress";
 			FILE *fin = fopen(compress_file.c_str(), "rb");
 			if( NULL == fin ){
 				std::cerr<<strerror(errno)<<std::endl;
-				fclose(fout);
+				return false;
+			}
+			std::string uncompress_file = file_name;
+			uncompress_file += ".uncompress";
+			FILE *fout = fopen(uncompress_file.c_str(), "wb");
+			if( NULL == fout ){
+				std::cerr<<strerror(errno)<<std::endl;
+				fclose(fin);
 				return false;
 			}
 
@@ -306,8 +314,6 @@ class file_compress{
 			////将整个文件读进内存
 			//fread(file_p, 1, file_size, fin);
 
-	//		uchar_count = 1;
-			int index = 0;
 			int pos = 8;
 			ch = fgetc(fin);
 			while(1){
@@ -319,13 +325,13 @@ class file_compress{
 				}
 				if(curr && curr->left == NULL && curr->right == NULL){
 					fputc(curr->weight.ch, fout);
-					std::cout<<"debug : "<<curr->weight.ch<<std::endl;
+	//				std::cout<<"write debug : "<<curr->weight.ch<<std::endl;
 					curr = root;
 					if( --uchar_count == 0 ){
 						break;
 					}
 				}
-				if( pos < 0 ){
+				if( pos <= 0 ){
 					pos = 8;
 					ch = fgetc(fin);
 					continue;
