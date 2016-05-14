@@ -38,7 +38,7 @@ struct uchar_info{
 	}
 	bool operator != (const uchar_info &_uchar)const
 	{
-		return this->appear_count > _uchar.appear_count;
+		return this->appear_count != _uchar.appear_count;
 	}
 	uchar_info operator + (const uchar_info &_uchar)
 	{
@@ -48,7 +48,7 @@ struct uchar_info{
 
 std::ostream& operator<<(std::ostream &os, const uchar_info &_info)
 {
-	os<<_info.ch<<":"<<_info.appear_count<<std::endl;;
+	os<<"debug : "<<(int)_info.ch<<":"<<_info.appear_count<<std::endl;;
 	return os;
 }
 
@@ -152,6 +152,11 @@ class file_compress{
 			huffman_tree<uchar_info> _tree;
 			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
 			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
+
+			std::cout<<"compress : +++++++++++++++++++++++++++"<<std::endl;
+			_tree.level_order();
+			std::cout<<"compress : +++++++++++++++++++++++++++"<<std::endl;
+
 			generate_huffman_code(_tree.get_root());
 
 			//4. 开始进行压缩
@@ -171,6 +176,7 @@ class file_compress{
 			while( !feof(fin) ){
 				unsigned char ch = fgetc(fin);
 				if( !feof(fin) ){//检测文件结尾，搜索一下feof的问题
+				std::cout<<"aaaaaa"<<std::endl;
 					std::string &code = file_infos[ch].huffman_code;
 					std::string::iterator _iter = code.begin();
 					for( ; _iter != code.end(); ++_iter ){
@@ -178,7 +184,7 @@ class file_compress{
 						if( *_iter == '1' ){
 							value |= 1;
 						}
-						if( ++pos == 8 ){//按照8比特为单位进行写入
+						if( ++pos >= 8 ){//按照8比特为单位进行写入
 							fputc(value, fout);
 							pos = 0;
 							value = 0;
@@ -188,8 +194,10 @@ class file_compress{
 			}
 			//对于非文本类文件，他的比特位置不一定按照8为基本单位, 可能就是二进制流
 			if(pos){
+				std::cout<<"before write in compress : "<<(int)value<<std::endl;
 				value <<= (8-pos);
 				fputc(value, fout);
+				std::cout<<"after write in compress : "<<(int)value<<std::endl;
 			}
 			fflush(fout);//刷新数据到文件
 
@@ -206,7 +214,7 @@ class file_compress{
 			
 			//uchar_count;
 			std::string config_str;
-			type_to_string(uchar_count, config_str); //long long 型变量提取高32位
+			type_to_string(uchar_count, config_str); 
 			fputs(config_str.c_str(), fconf);
 			fputc('\n', fconf);
 //			std::string config_str;
@@ -267,9 +275,9 @@ class file_compress{
 				}
 				ch = _line[0];
 				string_to_type(_line.substr(2), file_infos[ch].appear_count);
-//				std::cout<<"======================="<<std::endl;
-//				std::cout<<ch<<":"<<file_infos[ch].appear_count<<std::endl;
-//				std::cout<<"======================="<<std::endl;
+				std::cout<<"======================="<<std::endl;
+				std::cout<<(int)ch<<":"<<file_infos[ch].appear_count<<std::endl;
+				std::cout<<"======================="<<std::endl;
 			}
 			fclose(fconf);
 
@@ -278,9 +286,9 @@ class file_compress{
 			uchar_info invalid(0); //huffman中不需要出现次数为0的字符
 			_tree.create_huffman_tree(file_infos, 256, invalid); //构建huffman
 
-//			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
-//			_tree.level_order();
-//			std::cout<<"+++++++++++++++++++++++++++"<<std::endl;
+			std::cout<<"uncompress : +++++++++++++++++++++++++++"<<std::endl;
+			_tree.level_order();
+			std::cout<<"uncompress : +++++++++++++++++++++++++++"<<std::endl;
 
 			//4. 打开目标解压文件和原始压缩文件
 			std::string compress_file = file_name;
@@ -325,7 +333,7 @@ class file_compress{
 				}
 				if(curr && curr->left == NULL && curr->right == NULL){
 					fputc(curr->weight.ch, fout);
-	//				std::cout<<"write debug : "<<curr->weight.ch<<std::endl;
+					std::cout<<"write debug : "<<(int)curr->weight.ch<<std::endl;
 					curr = root;
 					if( --uchar_count == 0 ){
 						break;
