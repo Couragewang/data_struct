@@ -176,7 +176,6 @@ class file_compress{
 			while( !feof(fin) ){
 				unsigned char ch = fgetc(fin);
 				if( !feof(fin) ){//检测文件结尾，搜索一下feof的问题
-				std::cout<<"aaaaaa"<<std::endl;
 					std::string &code = file_infos[ch].huffman_code;
 					std::string::iterator _iter = code.begin();
 					for( ; _iter != code.end(); ++_iter ){
