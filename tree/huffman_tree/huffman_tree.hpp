@@ -134,6 +134,11 @@ public:
 		std::cout<<std::endl;
 	}
 
+	huffman_node_p get_root()
+	{
+		return root;
+	}
+
 	~huffman_tree()
 	{
 		_destroy(root);
