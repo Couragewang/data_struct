@@ -1,11 +1,36 @@
 #include <iostream>
-using namespace std;
-#define mut(a, b) (a)*(b)
+#include <string>
+#include <stdio.h>
 
+using namespace std;
 int main()
 {
-	cout<<mut(10, 10)<<endl;
+	std::string _val += (char)1;
+	cout<<_val<<endl;
+//	FILE *fp = fopen("./log", "rb");
+//	if( NULL == fp ){
+//		perror("fopen");
+//		return 1;
+//	}
+//
+//	int count = 0;
+//	while(!feof(fp))
+//	{
+//		fgetc(fp);
+//		count++;
+//	}
+//
+//	printf("%d\n", count);
+//	return 0;
 }
+
+//using namespace std;
+//#define mut(a, b) (a)*(b)
+//
+//int main()
+//{
+//	cout<<mut(10, 10)<<endl;
+//}
 //class test{
 //	private:
 //		int a;
