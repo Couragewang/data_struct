@@ -4,6 +4,6 @@ using namespace std;
 
 int main()
 {
-	std::cout<<"hello world"<<std::endl;
+	AVL_tree<int, char> _tree;
 	return 0;
 }

@@ -14,5 +14,114 @@
 //      4. 该子树依旧满足搜索二叉树的概念，则该树整体不受影响
 //      5. 平衡二叉树就是根据上面的概念，来避免搜索二叉树退化问题
 
+template <class K, class V>
+struct AVL_node{
+	K key;   //节点键值
+	V value; //节点内容
+
+	//连接信息
+	AVL_node<K, V> *left;
+	AVL_node<K, V> *right;
+	AVL_node<K, V> *parent;
+
+	//平衡因子
+	ssize_t bf;
+
+	//构造函数
+	AVL_node(const K &_key, const V &_value)
+		:key(_key)
+		,value(_value)
+		,left(NULL)
+		,right(NULL)
+		,parent(NULL)
+	{}
+};
+
+template<class K, class V>
+class AVL_tree{
+	typedef AVL_node<K, V> node_t, *node_p, &node_ref;
+
+	void delete_node(node_p &_node)
+	{
+		if( _node ){
+			delete _node;
+			_node = NULL;
+		}
+	}
+
+	node_p alloc_node(const K &_key, const V &_value)
+	{
+		node_p tmp = new node_t(_key, _value);
+		return tmp;
+	}
+
+	void _delete_tree(node_p &_root)
+	{
+		if( _root ){
+	        _delete_tree( _root->left );
+	        _delete_tree( _root->right );
+			if( _root->left == NULL && _root->right == NULL ){
+				delete_node(_root);
+			}
+		}
+	}
+
+	bool isempty()
+	{
+		return root == NULL;
+	}
+
+public:
+	AVL_tree()
+		:root(NULL)
+	{}
+
+	//在AVL中插入节点
+	bool insert(const K &_key, const V &_value)
+	{
+		//1. 当前是一棵空树
+		if( isempty() ){
+			root = alloc_node(_key, _value);
+			return true;
+		}
+
+		//2. 在搜索二叉树当中进行插入，需要先确认插入位置
+		node_p curr = root;
+		node_p parent = curr;
+		//通过curr游标，便利搜索二叉树
+		while( curr ){
+			if( _key < curr->key ){
+				parent = curr;
+				curr = curr->left;  //curr指向左孩子
+			}else if( _key > curr->key ){
+				parent = curr;
+				curr = curr->right;
+			}else{ //节点内容相等，搜索二叉树中，不允许有相同key节点存在
+				return false; //直接返回错误，无法插入
+			}
+		}
+		//3. 只要能走到这里，说明肯定已经找到对应的插入的位置了，这里需要强调一下，搜索二叉树的插入位置，肯定是在叶子节点处
+		//开始插入
+		node_p tmp = alloc_node( _key, _value );
+		if( parent && tmp->_key < parent->key ){//待插入节点key小于当前节点
+			parent->left = tmp; //插入左子树
+		}else{
+			parent->right = tmp; //插入左子树
+		}
+
+		//4. 确定是否平衡与旋转
+	}
+	~AVL_tree()
+	{
+		_delete_tree( root );
+	}
+
+private:
+	node_p root; //AVL树根节点
+};
+
+
+
+
 
 
