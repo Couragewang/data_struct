@@ -71,6 +71,41 @@ class AVL_tree{
 		return root == NULL;
 	}
 
+	//右旋
+	void _rotate_R(node_p &_node) //注意引用绝不能少
+	{
+		node_p _node_left = _node->left; 
+		node_p _node_left_right = _node_left->right;
+
+		_node->left = _node_left_right;
+		if(_node_left_right){
+			_node_left_right->parent = _node;
+		}
+		//提升左节点
+		_node_left->right = _node;
+		_node_left->parent = _node->parent;
+		_node->parent ＝ _node_left; //考虑_node节点的父节点为空的情况（是否为bug待定）
+		_node->bf = _node_left->bf = 0;
+		_node = _node_left;//更新新的父指针 ,curr指针不变
+	}
+	
+	//左旋
+	void _rotate_L(node_p &parent) //注意引用不能少
+	{
+		node_p _sub_right = parent->right;
+		node_p _sub_right_left = _sub_right->left;
+		parent->right = _sub_right_left;
+		if(_sub_right_left){
+			_sub_right_left->parent = parent;
+		}
+		_sub_right->left = parent;
+		_sub_right->parent = parent->parent;
+		parent->parent = _sub_right;
+
+		parent->bf = _sub_right->bf = 0;
+		parent = _sub_right; //更新新的父指针 ,curr指针不变
+	}
+
 public:
 	AVL_tree()
 		:root(NULL)
@@ -88,7 +123,7 @@ public:
 		//2. 在搜索二叉树当中进行插入，需要先确认插入位置
 		node_p curr = root;
 		node_p parent = curr;
-		//通过curr游标，便利搜索二叉树
+		//通过curr游标，遍历搜索二叉树
 		while( curr ){
 			if( _key < curr->key ){
 				parent = curr;
@@ -110,6 +145,38 @@ public:
 		}
 
 		//4. 确定是否平衡与旋转
+		bool is_rotate = false;
+		curr = tmp;
+		while( parent ){
+			if(parent->left == curr){//新增节点在当前节点左子树
+				--parent->bf; //新节点插入到了当前父节点的左子树部分
+			}else{
+				++parent->bf; //新节点插入到了当前父节点的右子树部分
+			}
+			//自低向上进行统计
+			//平衡因子本质其实是当前父节点的左右子树的高度差
+			//a. 插入新节点之后，当前父节点左右子树高度差为0,不需要调整
+			if( parent->bf == 0 ){
+				break;
+			}else if( parent->bf == -1 /*左子树深1*/ || parent->bf == 1 /*右子树深1*/ ){
+				//需要继续往上查找
+				curr = parent;
+				parent = curr->parent;
+			}else{ //否则需要进行旋转
+				is_rotate = true;
+				if( parent->bf == -2 ){ //左
+					if( curr->bf == -1 ){ //左左, 右旋
+						_rotate_R(parent); //此处注意，判断出来parent节点的左右子树不平衡，需要调整，但调整过程，对上层不影响
+					}else{ //左右
+					}
+				}else{ //右
+					if( curr->bf == 1 ){ //右右, 左旋
+						_rotate_L();
+					}else{ //右左
+					}
+				}
+			}
+		}
 	}
 	~AVL_tree()
 	{
