@@ -171,7 +171,7 @@ public:
 					}
 				}else{ //右
 					if( curr->bf == 1 ){ //右右, 左旋
-						_rotate_L();
+						_rotate_L(parent);
 					}else{ //右左
 					}
 				}
