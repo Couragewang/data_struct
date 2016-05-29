@@ -105,6 +105,32 @@ class AVL_tree{
 		parent->bf = _sub_right->bf = 0;
 		parent = _sub_right; //更新新的父指针 ,curr指针不变
 	}
+	
+	//先左旋后右旋
+	void _rotate_LR(node_p &parent)
+	{
+		//1. 先完成左旋
+		node_p _sub_left = parent->left;
+		node_p _sub_left_right = _sub_left->right;
+		node_p _sub_lr_left = _sub_left_right->left; //该子树是要被_sub_left接管的
+		_sub_left->right = _sub_lr_left;
+		if( _sub_lr_left ){
+			_sub_lr_left->parent = _sub_left;
+		}
+		_sub_left_right->left = _sub_left;
+		_sub_left->parent = _sub_left_right;
+		//2. 完成左旋之后，更新_sub_left的平衡因子
+		//   强调一下，对于_node_left_right节点的平衡因子，可以暂时不用调整，因为最终他的平衡因子会是0
+		if(_sub_left_right->bf == -1/*该节点的左子树高*/ || _sub_left_right->bf == 0 /*该节点左右子树等高*/){
+			//新增节点在_sub_left_right的左子树
+			_sub_left->bf = 0; //_sub_left(当前平衡因子是1)接管了_sub_left_right的左子树，并且新节点在_sub_left_right的左子树,接管之后，_sub_left的右子树少了一层
+		}else if( _sub_left_right->bf == 1 /*该节点的右子树高*/){
+			_sub_left->bf = -1; //同上
+		}else{
+			cerr<<"平衡因子异常"<<endl;
+		}
+		//2. 右旋
+	}
 
 public:
 	AVL_tree()
@@ -168,6 +194,7 @@ public:
 					if( curr->bf == -1 ){ //左左, 右旋
 						_rotate_R(parent); //此处注意，判断出来parent节点的左右子树不平衡，需要调整，但调整过程，对上层不影响
 					}else{ //左右
+						_rotate_LR(parent);
 					}
 				}else{ //右
 					if( curr->bf == 1 ){ //右右, 左旋
