@@ -150,10 +150,29 @@ class AVL_tree{
 		_new_sub_left->bf = 0;
 		parent = _new_sub_left;//更新外层指针
 	}
+
 	//先右旋后左旋
 	void _rotate_RL(node_p &parent)
 	{
+		node_p _sub_right = parent->right;
+		node_p _sub_right_left = _sub_right->left;
+		node_p _sub_rl_right = _sub_right_left->right;
+		//先右旋
+		_sub_right->left = _sub_rl_right;
+		if(_sub_rl_right){
+			_sub_rl_right->parent = _sub_right;
+		}
+		_sub_right_left->right = _sub_right;
+		_sub_right->parent = _sub_right_left; 
+		//旋转完成之后，更新_sub_right的平衡因子
+		//3种情况
+		if( _sub_rl_right->bf == 0 || _sub_rl_right->bf == 1){
 
+		}else if( _sub_rl_right->bf == -1 ){
+
+		}else{
+
+		}
 	}
 
 public:
