@@ -130,6 +130,16 @@ class AVL_tree{
 			cerr<<"平衡因子异常"<<endl;
 		}
 		//2. 右旋
+		node_p _new_sub_left = _sub_left_right;
+		node_p _new_sub_left_right = _new_sub_left->right;
+		_parent->left = _new_sub_left_right;
+		if( _new_sub_left_right ){
+			_new_sub_left_right->parent = parent;
+		}
+
+		_new_sub_left->right = parent;
+		parent->parent = _new_sub_left;
+
 	}
 
 public:
