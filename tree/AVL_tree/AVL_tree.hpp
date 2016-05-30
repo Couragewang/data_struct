@@ -138,7 +138,21 @@ class AVL_tree{
 		}
 
 		_new_sub_left->right = parent;
+		_new_sub_left->parent = parent->parent;//注意parent->parent当作左值和右值的区别
 		parent->parent = _new_sub_left;
+		if(_new_sub_left->bf == 0 || _new_sub_left->bf == 1/*当时新增节点在该节点的右子树*/){
+			parent->bf = 0;
+		}else if(_new_sub_left->bf = -1){
+			parent->bf = 1;
+		}else{
+			cerr<<"平衡因子异常"<<endl;
+		}
+		_new_sub_left->bf = 0;
+		parent = _new_sub_left;//更新外层指针
+	}
+	//先右旋后左旋
+	void _rotate_RL(node_p &parent)
+	{
 
 	}
 
