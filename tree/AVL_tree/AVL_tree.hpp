@@ -14,6 +14,8 @@
 //      4. 该子树依旧满足搜索二叉树的概念，则该树整体不受影响
 //      5. 平衡二叉树就是根据上面的概念，来避免搜索二叉树退化问题
 
+using namespace std;
+
 template <class K, class V>
 struct AVL_node{
 	K key;   //节点键值
@@ -39,7 +41,7 @@ struct AVL_node{
 
 template<class K, class V>
 class AVL_tree{
-	typedef AVL_node<K, V> node_t, *node_p, &node_ref;
+	typedef AVL_node<K, V> node_t, *node_p, **node_pp,&node_ref;
 
 	void delete_node(node_p &_node)
 	{
@@ -70,6 +72,42 @@ class AVL_tree{
 	{
 		return root == NULL;
 	}
+	
+	void _in_order( node_p &_root)
+	{
+		if( _root == NULL ){
+			return;
+		}
+		_in_order(_root->left);
+		cout<<_root->key<<" ";
+		_in_order(_root->right);
+	}
+
+	int _height(node_p &_root)
+	{
+		if( root == NULL ){
+			return 0;
+		}
+
+		int _left = _height(_root->left) + 1;
+		int _right = _height(_root->right) + 1;
+
+		return _left > _right?_left:_right;
+	}
+
+	bool _is_blance(node_p &_root){
+		if(root == NULL){
+			return 0;
+		}
+
+		int _left = _height( _root );
+		int _right = _height( _root );
+		if( abs(_left - _right) != abs(_root->bf) ){ //左右子树高度不等于根节点的平衡因子,有问题
+			cerr<<"平衡因子不合理： "<<endl;
+			return false;
+		}
+		return abs(_root->bf) <= 1;
+	}
 
 	//右旋
 	void _rotate_R(node_p &_node) //注意引用绝不能少
@@ -84,7 +122,8 @@ class AVL_tree{
 		//提升左节点
 		_node_left->right = _node;
 		_node_left->parent = _node->parent;
-		_node->parent ＝ _node_left; //考虑_node节点的父节点为空的情况（是否为bug待定）
+		_node->parent = _node_left; //考虑_node节点的父节点为空的情况
+
 		_node->bf = _node_left->bf = 0;
 		_node = _node_left;//更新新的父指针 ,curr指针不变
 	}
@@ -132,7 +171,7 @@ class AVL_tree{
 		//2. 右旋
 		node_p _new_sub_left = _sub_left_right;
 		node_p _new_sub_left_right = _new_sub_left->right;
-		_parent->left = _new_sub_left_right;
+		parent->left = _new_sub_left_right;
 		if( _new_sub_left_right ){
 			_new_sub_left_right->parent = parent;
 		}
@@ -142,7 +181,7 @@ class AVL_tree{
 		parent->parent = _new_sub_left;
 		if(_new_sub_left->bf == 0 || _new_sub_left->bf == 1/*当时新增节点在该节点的右子树*/){
 			parent->bf = 0;
-		}else if(_new_sub_left->bf = -1){
+		}else if(_new_sub_left->bf == -1){
 			parent->bf = 1;
 		}else{
 			cerr<<"平衡因子异常"<<endl;
@@ -157,22 +196,45 @@ class AVL_tree{
 		node_p _sub_right = parent->right;
 		node_p _sub_right_left = _sub_right->left;
 		node_p _sub_rl_right = _sub_right_left->right;
-		//先右旋
+		//1. 先右旋
 		_sub_right->left = _sub_rl_right;
 		if(_sub_rl_right){
 			_sub_rl_right->parent = _sub_right;
 		}
 		_sub_right_left->right = _sub_right;
 		_sub_right->parent = _sub_right_left; 
-		//旋转完成之后，更新_sub_right的平衡因子
-		//3种情况
-		if( _sub_rl_right->bf == 0 || _sub_rl_right->bf == 1){
-
-		}else if( _sub_rl_right->bf == -1 ){
-
+		//2. 旋转完成之后，更新_sub_right的平衡因子
+		//   3种情况
+		//平衡二叉：左右子树，要么相等，要么差一个节点
+		if( _sub_right_left->bf == 0/*只有3个节点的情况*/ || _sub_right_left->bf == 1){
+			_sub_right->bf = 0;
+		}else if( _sub_right_left->bf == -1 ){
+			_sub_right->bf = 1;
 		}else{
-
+			cerr<<"平衡因子异常"<<endl;
 		}
+
+		//3. 左旋
+		node_p _sub_rl_left = _sub_right_left->left;
+		parent->right = _sub_rl_left;
+		if(_sub_rl_left){
+			_sub_rl_left->parent = parent;
+		}
+		_sub_right_left->left = parent;
+		parent->parent = _sub_right_left;
+
+		//4. 更新平衡因子，有一个节点已经更新
+		if(_sub_right_left->bf == 0 || _sub_right_left->bf == -1){
+			parent->bf = 0;
+		}else if( _sub_right_left->bf == 1 ){
+			parent->bf = -1;
+		}else{
+			cerr<<"平衡因子异常"<<endl;
+		}
+
+		//5. 更新平衡因子
+		_sub_right_left->bf = 0; 
+		parent = _sub_right_left; //更新上层parent指针
 	}
 
 public:
@@ -207,7 +269,7 @@ public:
 		//3. 只要能走到这里，说明肯定已经找到对应的插入的位置了，这里需要强调一下，搜索二叉树的插入位置，肯定是在叶子节点处
 		//开始插入
 		node_p tmp = alloc_node( _key, _value );
-		if( parent && tmp->_key < parent->key ){//待插入节点key小于当前节点
+		if( parent && tmp->key < parent->key ){//待插入节点key小于当前节点
 			parent->left = tmp; //插入左子树
 		}else{
 			parent->right = tmp; //插入左子树
@@ -243,11 +305,66 @@ public:
 					if( curr->bf == 1 ){ //右右, 左旋
 						_rotate_L(parent);
 					}else{ //右左
+						_rotate_RL(parent);
 					}
 				}
 			}
 		}
+
+		if(is_rotate){
+			node_p pp_node = parent->parent; //parent指向旋转后的新子树根节点，并且该新节点的parent已经在旋转的时候得到更新, 此处直接使用即可
+			if( pp_node == NULL ){
+				root = parent;
+			}else{
+				if(pp_node->key > parent->key){ //父节点key大, 注意看看，此时，谁是父节点！！！
+					pp_node->left = parent;
+				}else{
+					pp_node->right = parent;
+				}
+			}
+		}
+		return true;
 	}
+
+	node_p find(const K &_key)
+	{
+		node_p curr = root;
+
+		while(curr){
+			if( curr->key > _key ){
+				curr = curr->left;
+			}else if( curr->key < _key ){
+				curr = curr->right;
+			}else{
+				return curr;
+			}
+		}
+
+		return NULL;
+	}
+
+	void in_order()
+	{
+		_in_order(root);
+		cout<<endl;
+	}
+
+	bool is_blance()
+	{
+		return _is_blance( root );
+	}
+
+	int height()
+	{
+		return _height( root );
+	}
+
+	bool remove(const K &_key)
+	{
+		//交给同学们自己完成, 选做一下
+		return true;
+	}
+
 	~AVL_tree()
 	{
 		_delete_tree( root );
