@@ -5,7 +5,7 @@ using namespace std;
 int main()
 {
     AVL_tree<int, int> t1;
-    int a1[] = {16, 3};
+    int a1[] = {16, 3, 1};
  //   int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
     
     for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)

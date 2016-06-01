@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <unistd.h>
+#include <stdlib.h>
 
 // 平衡二叉树（Balanced Binary Tree）是二叉查找树的一个进化体，也是第一个引入平衡概念的二叉树。
 // 1962年，G.M. Adelson-Velsky 和 E.M. Landis发明了这棵树，所以它又叫AVL树。平衡二叉树要求对于
