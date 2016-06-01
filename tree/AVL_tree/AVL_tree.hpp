@@ -274,8 +274,10 @@ public:
 		node_p tmp = alloc_node( _key, _value );
 		if( parent && tmp->key < parent->key ){//待插入节点key小于当前节点
 			parent->left = tmp; //插入左子树
+			tmp->parent = parent;
 		}else{
 			parent->right = tmp; //插入左子树
+			tmp->parent = parent;
 		}
 
 		//4. 确定是否平衡与旋转
