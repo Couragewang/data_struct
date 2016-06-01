@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <unistd.h>
 
 // 平衡二叉树（Balanced Binary Tree）是二叉查找树的一个进化体，也是第一个引入平衡概念的二叉树。
 // 1962年，G.M. Adelson-Velsky 和 E.M. Landis发明了这棵树，所以它又叫AVL树。平衡二叉树要求对于
@@ -33,6 +34,7 @@ struct AVL_node{
 	AVL_node(const K &_key, const V &_value)
 		:key(_key)
 		,value(_value)
+		,bf(0)
 		,left(NULL)
 		,right(NULL)
 		,parent(NULL)
@@ -112,6 +114,7 @@ class AVL_tree{
 	//右旋
 	void _rotate_R(node_p &_node) //注意引用绝不能少
 	{
+		cout<<"左旋啦"<<endl;
 		node_p _node_left = _node->left; 
 		node_p _node_left_right = _node_left->right;
 
@@ -284,6 +287,7 @@ public:
 			}else{
 				++parent->bf; //新节点插入到了当前父节点的右子树部分
 			}
+			cout<<"AAAAAA: "<<parent->bf<<endl;
 			//自低向上进行统计
 			//平衡因子本质其实是当前父节点的左右子树的高度差
 			//a. 插入新节点之后，当前父节点左右子树高度差为0,不需要调整
@@ -299,13 +303,13 @@ public:
 					if( curr->bf == -1 ){ //左左, 右旋
 						_rotate_R(parent); //此处注意，判断出来parent节点的左右子树不平衡，需要调整，但调整过程，对上层不影响
 					}else{ //左右
-						_rotate_LR(parent);
+//						_rotate_LR(parent);
 					}
 				}else{ //右
 					if( curr->bf == 1 ){ //右右, 左旋
-						_rotate_L(parent);
+//						_rotate_L(parent);
 					}else{ //右左
-						_rotate_RL(parent);
+//						_rotate_RL(parent);
 					}
 				}
 			}

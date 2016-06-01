@@ -5,14 +5,17 @@ using namespace std;
 int main()
 {
     AVL_tree<int, int> t1;
-    int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
+    int a1[] = {16, 3};
+ //   int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
     
     for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)
     {
+//		cout<<"before : "<<t1.height()<<endl;
 		t1.insert(a1[i], a1[i]);
+//		cout<<"end : "<<t1.height()<<endl;
     }
     
-//    t1.in_order();
+    t1.in_order();
     
 //    AVL_tree<int, int> t2;
 //
