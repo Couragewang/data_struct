@@ -76,7 +76,7 @@ class AVL_tree{
 		return root == NULL;
 	}
 	
-	void _in_order( node_p &_root)
+	void _in_order( node_p &_root )
 	{
 		if( _root == NULL ){
 			return;
@@ -86,9 +86,29 @@ class AVL_tree{
 		_in_order(_root->right);
 	}
 
+	void _pre_order( node_p &_root )
+	{
+		if( _root == NULL ){
+			return;
+		}
+		cout<<_root->key<<" ";
+		_pre_order(_root->left);
+		_pre_order(_root->right);
+	}
+
+	void _post_order( node_p &_root )
+	{
+		if( _root == NULL ){
+			return;
+		}
+		_post_order(_root->left);
+		_post_order(_root->right);
+		cout<<_root->key<<" ";
+	}
+
 	int _height(node_p &_root)
 	{
-		if( root == NULL ){
+		if( _root == NULL ){
 			return 0;
 		}
 
@@ -115,7 +135,6 @@ class AVL_tree{
 	//右旋
 	void _rotate_R(node_p &_node) //注意引用绝不能少
 	{
-		cout<<"左旋啦"<<endl;
 		node_p _node_left = _node->left; 
 		node_p _node_left_right = _node_left->right;
 
@@ -290,7 +309,6 @@ public:
 			}else{
 				++parent->bf; //新节点插入到了当前父节点的右子树部分
 			}
-			cout<<"AAAAAA: "<<parent->bf<<endl;
 			//自低向上进行统计
 			//平衡因子本质其实是当前父节点的左右子树的高度差
 			//a. 插入新节点之后，当前父节点左右子树高度差为0,不需要调整
@@ -306,15 +324,16 @@ public:
 					if( curr->bf == -1 ){ //左左, 右旋
 						_rotate_R(parent); //此处注意，判断出来parent节点的左右子树不平衡，需要调整，但调整过程，对上层不影响
 					}else{ //左右
-//						_rotate_LR(parent);
+						_rotate_LR(parent);
 					}
 				}else{ //右
 					if( curr->bf == 1 ){ //右右, 左旋
-//						_rotate_L(parent);
+						_rotate_L(parent);
 					}else{ //右左
-//						_rotate_RL(parent);
+						_rotate_RL(parent);
 					}
 				}
+				break;
 			}
 		}
 
@@ -352,7 +371,22 @@ public:
 
 	void in_order()
 	{
+		cout<<"in order: ";
 		_in_order(root);
+		cout<<endl;
+	}
+
+	void pre_order()
+	{
+		cout<<"pre order: ";
+		_pre_order( root );
+		cout<<endl;
+	}
+
+	void post_order()
+	{
+		cout<<"post order: ";
+		_post_order( root );
 		cout<<endl;
 	}
 
