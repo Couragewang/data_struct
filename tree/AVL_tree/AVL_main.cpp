@@ -2,6 +2,8 @@
 
 using namespace std;
 
+using namespace non_recursion;
+
 int main()
 {
     AVL_tree<int, int> t1;
