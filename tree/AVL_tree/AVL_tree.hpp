@@ -119,14 +119,14 @@ class AVL_tree{
 	}
 
 	bool _is_blance(node_p &_root){
-		if(root == NULL){
+		if(_root == NULL){
 			return 0;
 		}
 
-		int _left = _height( _root );
-		int _right = _height( _root );
+		int _left = _height( _root->left );
+		int _right = _height( _root->right );
 		if( abs(_left - _right) != abs(_root->bf) ){ //左右子树高度不等于根节点的平衡因子,有问题
-			cerr<<"平衡因子不合理： "<<endl;
+			cerr<<"平衡因子不合理： "<<abs(_left-_right)<<" : "<<abs(_root->bf)<<endl;
 			return false;
 		}
 		return abs(_root->bf) <= 1;
@@ -135,6 +135,9 @@ class AVL_tree{
 	//右旋
 	void _rotate_R(node_p &_node) //注意引用绝不能少
 	{
+#ifdef _DEBUG_
+		cout<<"right rotate"<<endl;
+#endif
 		node_p _node_left = _node->left; 
 		node_p _node_left_right = _node_left->right;
 
@@ -154,6 +157,9 @@ class AVL_tree{
 	//左旋
 	void _rotate_L(node_p &parent) //注意引用不能少
 	{
+#ifdef _DEBUG_
+		cout<<"left rotate"<<endl;
+#endif
 		node_p _sub_right = parent->right;
 		node_p _sub_right_left = _sub_right->left;
 		parent->right = _sub_right_left;
@@ -171,6 +177,9 @@ class AVL_tree{
 	//先左旋后右旋
 	void _rotate_LR(node_p &parent)
 	{
+#ifdef _DEBUG_
+		cout<<"left right rotate"<<endl;
+#endif
 		//1. 先完成左旋
 		node_p _sub_left = parent->left;
 		node_p _sub_left_right = _sub_left->right;
@@ -202,6 +211,7 @@ class AVL_tree{
 		_new_sub_left->right = parent;
 		_new_sub_left->parent = parent->parent;//注意parent->parent当作左值和右值的区别
 		parent->parent = _new_sub_left;
+
 		if(_new_sub_left->bf == 0 || _new_sub_left->bf == 1/*当时新增节点在该节点的右子树*/){
 			parent->bf = 0;
 		}else if(_new_sub_left->bf == -1){
@@ -216,6 +226,9 @@ class AVL_tree{
 	//先右旋后左旋
 	void _rotate_RL(node_p &parent)
 	{
+#ifdef _DEBUG_
+		cout<<"right left rotate"<<endl;
+#endif
 		node_p _sub_right = parent->right;
 		node_p _sub_right_left = _sub_right->left;
 		node_p _sub_rl_right = _sub_right_left->right;
@@ -244,6 +257,7 @@ class AVL_tree{
 			_sub_rl_left->parent = parent;
 		}
 		_sub_right_left->left = parent;
+		_sub_right_left->parent = parent->parent;
 		parent->parent = _sub_right_left;
 
 		//4. 更新平衡因子，有一个节点已经更新
@@ -268,6 +282,12 @@ public:
 	//在AVL中插入节点
 	bool insert(const K &_key, const V &_value)
 	{
+#ifdef _DEBUG_
+		cout<<"before  insert: "<<_key<<" inorder : ";
+		_in_order(root);
+		cout<<endl;
+#endif
+
 		//1. 当前是一棵空树
 		if( isempty() ){
 			root = alloc_node(_key, _value);
@@ -349,6 +369,11 @@ public:
 				}
 			}
 		}
+#ifdef _DEBUG_
+	cout<<"after insert: "<<_key<<" inorder : ";
+	_in_order(root);
+	cout<<endl;
+#endif
 		return true;
 	}
 
