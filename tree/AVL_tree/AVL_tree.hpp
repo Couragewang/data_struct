@@ -473,13 +473,12 @@ namespace recursion{
 			//左旋 -> 右右
 			void _rotate_L(node_p &parent)
 			{
-				//旋转 
-				node_p _sub_left = parent->left;
-				node_p _sub_left_right = _sub_left->right;
-				parent->left = _sub_left_right;
-				_sub_left->right = parent;
-				//更新平衡因子
-				parent->bf = _sub_left->bf = 0;
+				node_p _sub_right = parent->right;
+				node_p _sub_right_left = _sub_right->left;
+				parent->right = _sub_right_left;
+				_sub_right->left = parent;
+				parent->bf = _sub_right->bf = 0;
+				parent = _sub_right;
 			}
 
 			//左右旋 -> 左右
@@ -514,10 +513,14 @@ namespace recursion{
 			//右旋 -> 左左
 			void _rotate_R(node_p &parent)
 			{
-				node_p _sub_right = parent->right;
-				node_p _sub_right_left = _sub_right->left;
-				parent->right = _sub_right_left;
-				_sub_right->left = parent;
+				//旋转 
+				node_p _sub_left = parent->left;
+				node_p _sub_left_right = _sub_left->right;
+				parent->left = _sub_left_right;
+				_sub_left->right = parent;
+				//更新平衡因子
+				parent->bf = _sub_left->bf = 0;
+				parent = _sub_left;
 			}
 			//右左旋 -> 右左
 			void _rotate_RL(node_p &parent)
@@ -609,7 +612,7 @@ namespace recursion{
 						_root->bf--;  //左高度累加
 					}
 					//累加完毕之后，判断是否需要旋转平衡
-					if( _root->bf >= -2 ){
+					if( _root->bf == -2 ){
 						if( _root->left->bf == -1 ){ //左左
 							_rotate_R(_root);
 						}else{ //左右
@@ -623,7 +626,7 @@ namespace recursion{
 						_root->bf++;//右高度累加
 					}
 					//累加完毕之后，判断是否需要旋转平衡
-					if( _root->bf >= 2 ){
+					if( _root->bf == 2 ){
 						if( _root->left->bf == 1 ){ //右右
 							_rotate_L(_root);
 						}else{ //右左
@@ -651,7 +654,7 @@ namespace recursion{
 
 			void in_order()
 			{
-				cout<<"in order";
+				cout<<"in order: ";
 				_in_order(root);
 				cout<<endl;
 			}
@@ -673,9 +676,10 @@ namespace recursion{
 	};
     int test_avl()
     {
+		cout<<"test"<<endl;
         AVL_tree<int, int> t1;
-    	//int a1[] = {3, 1, 2};
-        int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
+    	int a1[] = {3, 2, 1};
+        //int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
         
         for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)
         {
@@ -684,28 +688,28 @@ namespace recursion{
         
         t1.in_order();
     
-        AVL_tree<int, int> t2;
-        int a2[] = {164, 34, 7, 112, 92, 26, 18, 143, 152, 9, 21, 3, 123};
-    
-        for (int  i = 0; i < sizeof(a2)/sizeof(int); ++i)
-        {
-    		t2.insert(a2[i], a2[i]);
-        }
-        
-        t2.in_order();
-        
-        AVL_tree<int, int> t3;
-    	int a3[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
-        for (int  i = 0; i < sizeof(a3)/sizeof(int); ++i)
-        {
-    		t3.insert(a3[i], a3[i]);
-        }
-        
-        t3.in_order();
-        
-        cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
-        cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
-        cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
+//        AVL_tree<int, int> t2;
+//        int a2[] = {164, 34, 7, 112, 92, 26, 18, 143, 152, 9, 21, 3, 123};
+//    
+//        for (int  i = 0; i < sizeof(a2)/sizeof(int); ++i)
+//        {
+//    		t2.insert(a2[i], a2[i]);
+//        }
+//        
+//        t2.in_order();
+//        
+//        AVL_tree<int, int> t3;
+//    	int a3[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
+//        for (int  i = 0; i < sizeof(a3)/sizeof(int); ++i)
+//        {
+//    		t3.insert(a3[i], a3[i]);
+//        }
+//        
+//        t3.in_order();
+//        
+//        cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
+//        cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
+//        cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
     
         return 0;
     }
