@@ -444,9 +444,270 @@ namespace non_recursion{
 
 }//end namespace
 
+//递归版本
 namespace recursion{
+	template<class K, class V>
+	struct AVL_node{
+		//key, value
+		K key;
+		V value;
+		//左右子树, 此处其实不需要parent
+		AVL_node<K, V> *left;
+		AVL_node<K, V> *right;
+		//平衡因子
+		ssize_t bf;
 
+		AVL_node(const K &_key = K(), const V &_value=V()):
+			key(_key)
+			,value(_value)
+			,left(NULL)
+			,right(NULL)
+			,bf(0)
+		{}
+	};
+
+	template< class K, class V >
+	class AVL_tree{
+			typedef AVL_node<K, V> node_t, *node_p, **node_pp;
+
+			//左旋 -> 右右
+			void _rotate_L(node_p &parent)
+			{
+				//旋转 
+				node_p _sub_left = parent->left;
+				node_p _sub_left_right = _sub_left->right;
+				parent->left = _sub_left_right;
+				_sub_left->right = parent;
+				//更新平衡因子
+				parent->bf = _sub_left->bf = 0;
+			}
+
+			//左右旋 -> 左右
+			void _rotate_LR(node_p &parent)
+			{
+				//左旋转
+				node_p _sub_left = parent->left;
+				node_p _sub_left_right = _sub_left->right;
+				node_p _sub_lr_left = _sub_left_right->left;
+				_sub_left->right = _sub_lr_left;
+				_sub_left_right->left = _sub_left;
+				//更新_sub_left的平衡因子
+				 if(_sub_left_right->bf == 1){ //插入到了_sub_left_right节点的右子树
+					 _sub_left->bf = -1;
+				 }else{
+					 _sub_left->bf = 0;
+				 }
+
+				 //右旋
+				 node_p _sub_lr_right = _sub_left_right->right;
+				 parent->left = _sub_lr_right;
+				 _sub_left_right->left = parent;
+				 //更新parent的平衡因子
+				 if(_sub_left_right->bf == 1){
+					 parent->bf = 0;
+				 }else{
+					 parent->bf = 1;
+				 }
+				 _sub_left_right->bf = 0;
+				 parent = _sub_left_right; //更新指向调整子树的指针
+			}
+			//右旋 -> 左左
+			void _rotate_R(node_p &parent)
+			{
+				node_p _sub_right = parent->right;
+				node_p _sub_right_left = _sub_right->left;
+				parent->right = _sub_right_left;
+				_sub_right->left = parent;
+			}
+			//右左旋 -> 右左
+			void _rotate_RL(node_p &parent)
+			{
+				node_p _sub_right = parent->right;
+				node_p _sub_right_left = _sub_right->left;
+				node_p _sub_rl_right = _sub_right_left->right;
+
+				//先右旋
+				_sub_right->left = _sub_rl_right;
+				_sub_right_left->right = _sub_right;
+				//更新_sub_right的平衡因子
+				if( _sub_right_left->bf == 1 ){
+					_sub_right->bf = 0;
+				}else{
+					_sub_right->bf = 1;
+				}
+				
+				//左旋
+				node_p _sub_rl_left = _sub_right_left->left;
+				parent->left = _sub_rl_left;
+				_sub_right->left = parent;
+				//更新平衡因子
+				if( _sub_right_left->bf == 1 ){
+					parent->bf = -1;
+				}else{
+					parent->bf = 0;
+				}
+
+				_sub_right_left->bf = 0;
+				parent = _sub_right_left;
+			}
+
+			void _in_order(node_p &_root)
+			{
+				if(_root){
+					_in_order(_root->left);
+					cout<<_root->key<<" ";
+					_in_order(_root->right);
+				}
+			}
+		
+			ssize_t _height(node_p &_root)
+			{
+				if(_root == NULL){
+					return 0;
+				}
+
+				ssize_t _left = _height(_root->left) + 1;
+				ssize_t _right = _height(_root->right) + 1;
+				return _left > _right?_left:_right;
+			}
+
+			int _is_blance(node_p &_root)
+			{
+				if( !_root ){
+					return 0;
+				}
+				ssize_t _left = _height(_root->left);
+				ssize_t _right = _height(_root->left);
+				if( abs(_left-_right) != abs(_root->bf) ){
+					cerr<<"平衡因子不合理： "<<abs(_left-_right)<<" : "<<abs(_root->bf)<<endl;
+					return 0;
+				}
+
+				return abs(_root->bf) <= 1 ? 1:0;
+			}
+
+    	    node_p alloc_node(const K &_key, const V &_value)
+    	    {
+    	    	node_p tmp = new node_t(_key, _value);
+    	    	return tmp;
+    	    }
+
+		public:
+			AVL_tree():
+				root(NULL)
+			{}
+
+			bool _insert(node_p &_root, const K &_key,const V &_value, bool &is_rotate)
+			{
+				bool ret = false;
+				if( _root == NULL ){
+					_root = alloc_node(_key, _value);
+					ret = true;
+				}else if( _root->key > _key ){//插入节点在当前节点左子树
+					ret = _insert(_root->left, _key, _value, is_rotate);
+					if( !is_rotate ){ //当前并没有被旋转,从左分支返回上来的
+						_root->bf--;  //左高度累加
+					}
+					//累加完毕之后，判断是否需要旋转平衡
+					if( _root->bf >= -2 ){
+						if( _root->left->bf == -1 ){ //左左
+							_rotate_R(_root);
+						}else{ //左右
+							_rotate_LR(_root);
+						}
+						is_rotate = true;
+					}
+				}else if( _root->key < _key ){//插入节点在当前节点右子树
+					ret = _insert(_root->right, _key, _value, is_rotate);
+					if( !is_rotate ){//当前并没有被旋转,从右分支返回上来的
+						_root->bf++;//右高度累加
+					}
+					//累加完毕之后，判断是否需要旋转平衡
+					if( _root->bf >= 2 ){
+						if( _root->left->bf == 1 ){ //右右
+							_rotate_L(_root);
+						}else{ //右左
+							_rotate_RL(_root);
+						}
+						is_rotate = true;
+					}
+				}else{
+					ret = false; //插入失败
+					is_rotate = true; //直接返回,不做累加
+				}
+				return ret;
+			}
+
+			bool is_empty()
+			{
+				return root == NULL;
+			}
+
+			bool insert(const K &_key, const V &_value)
+			{
+				bool is_rotate = false;
+				return _insert(root, _key, _value, is_rotate);
+			}
+
+			void in_order()
+			{
+				cout<<"in order";
+				_in_order(root);
+				cout<<endl;
+			}
+
+			ssize_t height()
+			{
+				return _height(root);
+			}
+
+			int is_blance()
+			{
+				return _is_blance(root);
+			}
+
+			~AVL_tree()
+			{}
+		private:
+			node_p root; //树根
+	};
+    int test_avl()
+    {
+        AVL_tree<int, int> t1;
+    	//int a1[] = {3, 1, 2};
+        int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
+        
+        for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)
+        {
+    		t1.insert(a1[i], a1[i]);
+        }
+        
+        t1.in_order();
+    
+        AVL_tree<int, int> t2;
+        int a2[] = {164, 34, 7, 112, 92, 26, 18, 143, 152, 9, 21, 3, 123};
+    
+        for (int  i = 0; i < sizeof(a2)/sizeof(int); ++i)
+        {
+    		t2.insert(a2[i], a2[i]);
+        }
+        
+        t2.in_order();
+        
+        AVL_tree<int, int> t3;
+    	int a3[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
+        for (int  i = 0; i < sizeof(a3)/sizeof(int); ++i)
+        {
+    		t3.insert(a3[i], a3[i]);
+        }
+        
+        t3.in_order();
+        
+        cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
+        cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
+        cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
+    
+        return 0;
+    }
 }
-
-
 

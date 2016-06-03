@@ -2,10 +2,12 @@
 
 using namespace std;
 
-using namespace non_recursion;
-
+//using namespace non_recursion;
+using namespace recursion;
 int main()
 {
+	//non_recursion
+	/*
     AVL_tree<int, int> t1;
 	//int a1[] = {3, 1, 2};
     int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
@@ -39,5 +41,15 @@ int main()
     cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
     cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
     cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
+	*/
+
+	//recursion
+	test_avl();
+
     return 0;
 }
+
+
+
+
+
