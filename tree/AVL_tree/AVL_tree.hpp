@@ -500,9 +500,9 @@ namespace recursion{
 				 //右旋
 				 node_p _sub_lr_right = _sub_left_right->right;
 				 parent->left = _sub_lr_right;
-				 _sub_left_right->left = parent;
+				 _sub_left_right->right = parent;
 				 //更新parent的平衡因子
-				 if(_sub_left_right->bf == 1){
+				 if(_sub_left_right->bf == 1 || _sub_left_right->bf == 0){
 					 parent->bf = 0;
 				 }else{
 					 parent->bf = 1;
@@ -533,7 +533,7 @@ namespace recursion{
 				_sub_right->left = _sub_rl_right;
 				_sub_right_left->right = _sub_right;
 				//更新_sub_right的平衡因子
-				if( _sub_right_left->bf == 1 ){
+				if( _sub_right_left->bf == 1 || _sub_right_left->bf == 0){
 					_sub_right->bf = 0;
 				}else{
 					_sub_right->bf = 1;
@@ -541,8 +541,8 @@ namespace recursion{
 				
 				//左旋
 				node_p _sub_rl_left = _sub_right_left->left;
-				parent->left = _sub_rl_left;
-				_sub_right->left = parent;
+				parent->right = _sub_rl_left;
+				_sub_right_left->left= parent;
 				//更新平衡因子
 				if( _sub_right_left->bf == 1 ){
 					parent->bf = -1;
@@ -580,13 +580,13 @@ namespace recursion{
 					return 0;
 				}
 				ssize_t _left = _height(_root->left);
-				ssize_t _right = _height(_root->left);
-				if( abs(_left-_right) != abs(_root->bf) ){
+				ssize_t _right = _height(_root->right);
+				if( abs(_left - _right) != abs(_root->bf) ){
 					cerr<<"平衡因子不合理： "<<abs(_left-_right)<<" : "<<abs(_root->bf)<<endl;
 					return 0;
 				}
 
-				return abs(_root->bf) <= 1 ? 1:0;
+				return abs(_root->bf) <= 1;
 			}
 
     	    node_p alloc_node(const K &_key, const V &_value)
@@ -627,7 +627,7 @@ namespace recursion{
 					}
 					//累加完毕之后，判断是否需要旋转平衡
 					if( _root->bf == 2 ){
-						if( _root->left->bf == 1 ){ //右右
+						if( _root->right->bf == 1 ){ //右右
 							_rotate_L(_root);
 						}else{ //右左
 							_rotate_RL(_root);
@@ -678,8 +678,8 @@ namespace recursion{
     {
 		cout<<"test"<<endl;
         AVL_tree<int, int> t1;
-    	int a1[] = {3, 2, 1};
-        //int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
+ //   	int a1[] = {1,3,2};
+        int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
         
         for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)
         {
@@ -688,28 +688,28 @@ namespace recursion{
         
         t1.in_order();
     
-//        AVL_tree<int, int> t2;
-//        int a2[] = {164, 34, 7, 112, 92, 26, 18, 143, 152, 9, 21, 3, 123};
-//    
-//        for (int  i = 0; i < sizeof(a2)/sizeof(int); ++i)
-//        {
-//    		t2.insert(a2[i], a2[i]);
-//        }
-//        
-//        t2.in_order();
-//        
-//        AVL_tree<int, int> t3;
-//    	int a3[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
-//        for (int  i = 0; i < sizeof(a3)/sizeof(int); ++i)
-//        {
-//    		t3.insert(a3[i], a3[i]);
-//        }
-//        
-//        t3.in_order();
-//        
-//        cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
-//        cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
-//        cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
+        AVL_tree<int, int> t2;
+        int a2[] = {164, 34, 7, 112, 92, 26, 18, 143, 152, 9, 21, 3, 123};
+    
+        for (int  i = 0; i < sizeof(a2)/sizeof(int); ++i)
+        {
+    		t2.insert(a2[i], a2[i]);
+        }
+        
+        t2.in_order();
+        
+        AVL_tree<int, int> t3;
+    	int a3[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
+        for (int  i = 0; i < sizeof(a3)/sizeof(int); ++i)
+        {
+    		t3.insert(a3[i], a3[i]);
+        }
+        
+        t3.in_order();
+        
+        cout<<"t1是否平衡?:"<<t1.is_blance()<<endl;
+        cout<<"t2是否平衡?:"<<t2.is_blance()<<endl;
+        cout<<"t3是否平衡?:"<<t3.is_blance()<<endl;
     
         return 0;
     }
