@@ -678,9 +678,8 @@ namespace recursion{
     {
 		cout<<"test"<<endl;
         AVL_tree<int, int> t1;
- //   	int a1[] = {1,3,2};
-        int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
-        
+    	int a1[] = {3, 2, 1};
+ //     int a1[] = {16, 3, 7, 11, 9, 26, 18, 14, 15};
         for (int  i = 0; i < sizeof(a1)/sizeof(int); ++i)
         {
     		t1.insert(a1[i], a1[i]);
