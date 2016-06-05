@@ -1,5 +1,5 @@
-rb_main:rb_main.cpp
+rb_tree:rb_main.cpp
 	g++ -o $@ $^
 .PHONY:clean
 clean:
-	rm -f rb_main
+	rm -f rb_tree
