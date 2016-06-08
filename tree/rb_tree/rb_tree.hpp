@@ -32,7 +32,7 @@ namespace RB{
 		_rb_node<K, V> *right;
 		_rb_node<K, V> *parent;
 
-		_rb_node(const K & _key = K(), const V &_value = V(), COLOR_T &_color = RED )
+		_rb_node(const K & _key = K(), const V &_value = V(), const COLOR_T &_color = RED )
 			:key(_key)
 			,value(_value)
 			,color(_color) //新节点默认颜色是红色，想想为什么?
@@ -106,7 +106,7 @@ namespace RB{
 				}
 			    //parent 指向当前节点的插入位置的父节点
 			    curr = alloc_node(_key, _value);
-			    if( parent->key > key ){
+			    if( parent->key > _key ){
 			    	//插入左子树
 			    	parent->left = curr;
 			    	curr->parent = parent;
@@ -116,11 +116,56 @@ namespace RB{
 			    	curr->parent = parent;
 			    }
 
-				//插入完毕，接下来进行调整
+				//插入完毕，接下来进行调整, 红黑树是近似平衡二叉树，所以有些情况并不需要调整
+				//关于插入，待插入节点颜色必须是红色，因为如果是黑色， 会导致规则5不合法
+				//而如果插入的节点的父节点是红色，而当前节点的颜色也是红色，导致规则4不合法
+				//换句话说，如果待插入节点的父节点是黑色，则不需要调整!!!
+				while( curr && parent->color == RED ){
+					node_p grandfather = parent->parent;//肯定不为空，因为parent->color是红色，说明肯定不是根节点（根节点是黑色）
+					if( parent == grandfather->left ){ //父节点是祖父节点的左孩子
+						node_p uncle = grandfather->right; //叔叔节点
+						if( uncle && uncle->color == RED ){ //情况1. parent和uncle都是红色的（grandfather肯定是黑色的), 逐次向上进行颜色变换。
+							parent->color = BLACK;
+							uncle->color = BLACK;
+							grandfather->color = RED;
+							curr = grandfather;
+							parent = curr->parent;
+						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转 
+							if(curr == parent->right){//左右
+								//转换成左左
+								_rotate_left(parent, _root); //左旋
+								parent = curr;
+							}
 
+							grandfather->color = RED;
+							parent->color = BLACK;
+							_rotate_right(grandfather, _root);
+						}
+					}else{//父节点是祖父节点的左孩子
+						node_p uncle = grandfather->left; //叔叔节点 
+						if( uncle && uncle->color == RED ){//同情况1
+							uncle->color = BLACK;
+							parent->color = BLACK;
+							grandfather->color = RED;
+							curr = grandfather;
+							parent = curr->parent;
+						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转
+							if( curr == parent->left ){ //右左
+								//转化成右右
+								_rotate_right(parent, _root);
+								parent = curr;
+							}
+
+							grandfather->color = RED;
+							parent->color = BLACK;
+							_rotate_left(grandfather, _root);
+						}
+					}
+				}
 			}
-
 		private:
+			void _rotate_left(node_p &rotate_node, node_p &_root); //左旋
+			void _rotate_right(node_p &rotate_node, node_p &_root); //右旋
 
 			node_p root;//红黑树树根
 	};
@@ -130,8 +175,5 @@ namespace RB{
 		rb_tree<int, int> tree;
 	}
 }
-
-
-
 
 
