@@ -46,138 +46,6 @@ namespace RB{
 	template<class K, class V>
 	class rb_tree{
 		typedef _rb_node<K, V> node_t, *node_p;
-		public:
-			rb_tree():
-				root(NULL)
-			{}
-
-			~rb_tree()
-			{
-				_destroy(root);
-			}
-
-			//插入新节点总是红色节点, 因为不会破坏性质 5, 尽可能维持所有性质.
-			bool insert(const K &_key, const V &_value)
-			{
-				return _insert(root, _key, _value);
-			}
-
-			void in_order()
-			{
-				cout<<"in order: ";
-				_in_order(root);
-				cout<<endl;
-			}
-
-			bool is_blance()
-			{
-				return _is_blance(root);
-			}
-
-		private:
-			void _delete_node(node_p &_node)
-			{
-				if( _node ){
-					delete _node;
-					_node = NULL;
-				}
-			}
-
-			node_p alloc_node(const K &_key, const V &_value, COLOR_T &_color)
-			{
-				node_p tmp = new node_t(_key, _value, _color);
-				return tmp;
-			}
-
-			void _destroy(node_p &_root)
-			{
-				if(_root){
-					_destroy(_root->left);
-					_destroy(_root->right);
-					_delete_node(_root);
-				}
-			}
-
-			//红黑树照样也是平衡二叉树
-			bool _insert(node_p &_root, const K &_key, const V &_value)
-			{
-				if( !_root ){
-					_root = alloc_node(_key, _value, BLACK);
-					return true;
-				}
-				node_p curr = _root;
-				node_p parent = curr;
-				while(curr){
-					if( curr->key > _key ){ //新插入节点，左子树
-						parent = curr;
-						curr = curr->left;
-					}else if( curr->key < _key ){//新插入节点，右子树
-						parent = curr;
-						curr = curr->right;
-					}else{ //有重复元素，直接返回
-						return false;
-					}
-				}
-			    //parent 指向当前节点的插入位置的父节点
-			    curr = alloc_node(_key, _value);
-			    if( parent->key > _key ){
-			    	//插入左子树
-			    	parent->left = curr;
-			    	curr->parent = parent;
-			    }else{
-			    	//插入右子树
-			    	parent->right = curr;
-			    	curr->parent = parent;
-			    }
-
-				//插入完毕，接下来进行调整, 红黑树是近似平衡二叉树，所以有些情况并不需要调整
-				//关于插入，待插入节点颜色必须是红色，因为如果是黑色， 会导致规则5不合法
-				//而如果插入的节点的父节点是红色，而当前节点的颜色也是红色，导致规则4不合法
-				//换句话说，如果待插入节点的父节点是黑色，则不需要调整!!!
-				while( curr && parent->color == RED ){
-					node_p grandfather = parent->parent;//肯定不为空，因为parent->color是红色，说明肯定不是根节点（根节点是黑色）
-					if( parent == grandfather->left ){ //父节点是祖父节点的左孩子
-						node_p uncle = grandfather->right; //叔叔节点
-						if( uncle && uncle->color == RED ){ //情况1. parent和uncle都是红色的（grandfather肯定是黑色的), 逐次向上进行颜色变换。
-							parent->color = BLACK;
-							uncle->color = BLACK;
-							grandfather->color = RED;
-							curr = grandfather;
-							parent = curr->parent;
-						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转 
-							if(curr == parent->right){//左右
-								//转换成左左
-								_rotate_left(parent, _root); //左旋
-								parent = curr;
-							}
-
-							grandfather->color = RED;
-							parent->color = BLACK;
-							_rotate_right(grandfather, _root);
-						}
-					}else{//父节点是祖父节点的左孩子
-						node_p uncle = grandfather->left; //叔叔节点 
-						if( uncle && uncle->color == RED ){//同情况1
-							uncle->color = BLACK;
-							parent->color = BLACK;
-							grandfather->color = RED;
-							curr = grandfather;
-							parent = curr->parent;
-						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转
-							if( curr == parent->left ){ //右左
-								//转化成右右
-								_rotate_right(parent, _root);
-								parent = curr;
-							}
-							grandfather->color = RED;
-							parent->color = BLACK;
-							_rotate_left(grandfather, _root);
-						}
-					}
-				}
-			}
-
-
 		private:
 			void _rotate_left(node_p &rotate_node, node_p &_root)//左旋
 			{
@@ -258,6 +126,139 @@ namespace RB{
 
 				return true;
 			}
+		public:
+			rb_tree():
+				root(NULL)
+			{}
+
+			~rb_tree()
+			{
+				_destroy(root);
+			}
+
+			//插入新节点总是红色节点, 因为不会破坏性质 5, 尽可能维持所有性质.
+			bool insert(const K &_key, const V &_value)
+			{
+				return _insert(root, _key, _value);
+			}
+
+			void in_order()
+			{
+				cout<<"in order: ";
+				_in_order(root);
+				cout<<endl;
+			}
+
+			bool is_blance()
+			{
+				return _is_blance(root);
+			}
+
+		private:
+			void _delete_node(node_p &_node)
+			{
+				if( _node ){
+					delete _node;
+					_node = NULL;
+				}
+			}
+
+			node_p alloc_node(const K &_key, const V &_value, const COLOR_T &_color)
+			{
+				node_p tmp = new node_t(_key, _value, _color);
+				return tmp;
+			}
+
+			void _destroy(node_p &_root)
+			{
+			    if(_root){
+					_destroy(_root->left);
+					_destroy(_root->right);
+					_delete_node(_root);
+				}
+			}
+
+			//红黑树照样也是平衡二叉树
+			bool _insert(node_p &_root, const K &_key, const V &_value)
+			{
+				if( !_root ){
+					_root = alloc_node(_key, _value, BLACK);
+					return true;
+				}
+				node_p curr = _root;
+				node_p parent = curr;
+				while(curr){
+					if( curr->key > _key ){ //新插入节点，左子树
+						parent = curr;
+						curr = curr->left;
+					}else if( curr->key < _key ){//新插入节点，右子树
+						parent = curr;
+						curr = curr->right;
+					}else{ //有重复元素，直接返回
+						return false;
+					}
+				}
+			    //parent 指向当前节点的插入位置的父节点
+			    curr = alloc_node(_key, _value, RED);
+			    if( parent->key > _key ){
+			    	//插入左子树
+			    	parent->left = curr;
+			    	curr->parent = parent;
+			    }else{
+			    	//插入右子树
+			    	parent->right = curr;
+			    	curr->parent = parent;
+			    }
+
+				//插入完毕，接下来进行调整, 红黑树是近似平衡二叉树，所以有些情况并不需要调整
+				//关于插入，待插入节点颜色必须是红色，因为如果是黑色， 会导致规则5不合法
+				//而如果插入的节点的父节点是红色，而当前节点的颜色也是红色，导致规则4不合法
+				//换句话说，如果待插入节点的父节点是黑色，则不需要调整!!!
+				while( curr && parent->color == RED ){
+					node_p grandfather = parent->parent;//肯定不为空，因为parent->color是红色，说明肯定不是根节点（根节点是黑色）
+					if( parent == grandfather->left ){ //父节点是祖父节点的左孩子
+						node_p uncle = grandfather->right; //叔叔节点
+						if( uncle && uncle->color == RED ){ //情况1. parent和uncle都是红色的（grandfather肯定是黑色的), 逐次向上进行颜色变换。
+							parent->color = BLACK;
+							uncle->color = BLACK;
+							grandfather->color = RED;
+							curr = grandfather;
+							parent = curr->parent;
+						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转 
+							if(curr == parent->right){//左右
+								//转换成左左
+								_rotate_left(parent, _root); //左旋
+								parent = curr;
+							}
+
+							grandfather->color = RED;
+							parent->color = BLACK;
+							_rotate_right(grandfather, _root);
+						}
+					}else{//父节点是祖父节点的左孩子
+						node_p uncle = grandfather->left; //叔叔节点 
+						if( uncle && uncle->color == RED ){//同情况1
+							uncle->color = BLACK;
+							parent->color = BLACK;
+							grandfather->color = RED;
+							curr = grandfather;
+							parent = curr->parent;
+						}else{//当插入节点的uncle节点不存在或者是黑色，要进行旋转
+							if( curr == parent->left ){ //右左
+								//转化成右右
+								_rotate_right(parent, _root);
+								parent = curr;
+							}
+							grandfather->color = RED;
+							parent->color = BLACK;
+							_rotate_left(grandfather, _root);
+						}
+					}
+				}
+				return true;
+			}
+
+
 
 		private:
 			node_p root;//红黑树树根
@@ -266,7 +267,21 @@ namespace RB{
 	void auto_test()
 	{
 		rb_tree<int, int> tree;
+		int a[] = {2,3,4,1,23,13,34,45,556,67,6};
+		int len;
+		len = sizeof(a)/sizeof(a[0]);
+		int i = 0;
+		for(; i < len; i++){
+			tree.insert(a[i], a[i]);
+		}
+		tree.in_order();
 	}
 }
+
+
+
+
+
+
 
 
