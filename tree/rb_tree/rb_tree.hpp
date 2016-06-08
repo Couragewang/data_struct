@@ -155,7 +155,6 @@ namespace RB{
 								_rotate_right(parent, _root);
 								parent = curr;
 							}
-
 							grandfather->color = RED;
 							parent->color = BLACK;
 							_rotate_left(grandfather, _root);
@@ -164,8 +163,48 @@ namespace RB{
 				}
 			}
 		private:
-			void _rotate_left(node_p &rotate_node, node_p &_root); //左旋
-			void _rotate_right(node_p &rotate_node, node_p &_root); //右旋
+			void _rotate_left(node_p &rotate_node, node_p &_root)//左旋
+			{
+				node_p _sub_right = rotate_node->right;
+				node_p _sub_right_left = _sub_right->left;
+				rotate_node->right = _sub_right_left;
+				if( _sub_right_left ){
+					_sub_right_left->parent = rotate_node;
+				}
+
+				_sub_right->left = rotate_node;
+
+				if( rotate_node == _root ){ //当前的轴心旋转节点是根节点
+					_root = _sub_right;
+				}else if( rotate_node->parent->left == rotate_node ){ //否则当前节点不是根节点, 之前必定有其他节点,轴心旋转节点是它的父节点的左孩子
+					rotate_node->parent->left = _sub_right;
+				}else{
+					rotate_node->parent->right = _sub_right;
+				}
+				_sub_right->parent = rotate_node->parent;
+				rotate_node->parent = _sub_right;
+			}
+
+			void _rotate_right(node_p &rotate_node, node_p &_root) //右旋
+			{
+				node_p _sub_left = rotate_node->left;
+				node_p _sub_left_right = _sub_left->right;
+				rotate_node->left = _sub_left_right;
+				if( _sub_left_right ){
+					_sub_left_right->parent = rotate_node;
+				}
+				_sub_left->right = rotate_node;
+				if( rotate_node == _root ){
+					_root = _sub_left;
+				}else if( rotate_node->parent->left == rotate_node ){
+					rotate_node->parent->left = _sub_left;
+				}else{
+					rotate_node->parent->right = _sub_left;
+				}
+
+				_sub_left->parent = rotate_node->parent;
+				rotate_node->parent = _sub_left;
+			}
 
 			node_p root;//红黑树树根
 	};
