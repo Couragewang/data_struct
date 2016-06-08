@@ -62,6 +62,18 @@ namespace RB{
 				return _insert(root, _key, _value);
 			}
 
+			void in_order()
+			{
+				cout<<"in order: ";
+				_in_order(root);
+				cout<<endl;
+			}
+
+			bool is_blance()
+			{
+				return _is_blance(root);
+			}
+
 		private:
 			void _delete_node(node_p &_node)
 			{
@@ -70,11 +82,13 @@ namespace RB{
 					_node = NULL;
 				}
 			}
+
 			node_p alloc_node(const K &_key, const V &_value, COLOR_T &_color)
 			{
 				node_p tmp = new node_t(_key, _value, _color);
 				return tmp;
 			}
+
 			void _destroy(node_p &_root)
 			{
 				if(_root){
@@ -162,6 +176,8 @@ namespace RB{
 					}
 				}
 			}
+
+
 		private:
 			void _rotate_left(node_p &rotate_node, node_p &_root)//左旋
 			{
@@ -206,6 +222,44 @@ namespace RB{
 				rotate_node->parent = _sub_left;
 			}
 
+			void _in_order( node_p &_root)
+			{
+				if( _root ){
+					_in_order( _root->left );
+					cout<<_root->key<<" ";
+					_in_order( _root->right );
+				}
+			}
+
+			int _height( node_p &_root)
+			{
+				if( _root ){
+					int _left = _height(_root->left) + 1;
+					int _right = _height(_root->right) + 1;
+					return _left > _right?_left:_right;
+				}
+			}
+
+			bool _is_blance(node_p &_root)
+			{
+				if(!_root){
+					return false;
+				}
+
+				int _left = _height(_root->left);
+				int _right = _height(_root->right);
+
+				if( _left > _right && 2*_left > _right ){//左子树高于右子树两倍以上
+					return false;
+				}
+				if( _left < _right && _left < _right*2 ){//右子树高于左子树两倍以上
+					return false;
+				}
+
+				return true;
+			}
+
+		private:
 			node_p root;//红黑树树根
 	};
 
