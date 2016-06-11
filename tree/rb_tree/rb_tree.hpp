@@ -108,6 +108,7 @@ namespace RB{
 					int _right = _height(_root->right) + 1;
 					return _left > _right?_left:_right;
 				}
+				return 0;
 			}
 
 			bool _is_blance(node_p &_root)
@@ -302,14 +303,14 @@ namespace RB{
 		srand(time(0));
 		rb_tree<int, int> tree2;
 
-		for( i = 0; i < 10000; i++ ){
-			tree2.insert(rand()%10000, i);
-			if( i%100 == 0 ){
-				cout<<"/////////////////////////////////////////////////////////////////"<<endl;
-				tree2.in_order();
-				cout<<"is blance : "<<tree2.is_blance()<<endl;
-			}
-		}
+//		for( i = 0; i < 10000; i++ ){
+//			tree2.insert(rand()%10000, i);
+//			if( i%100 == 0 ){
+//				cout<<"/////////////////////////////////////////////////////////////////"<<endl;
+//				tree2.in_order();
+//				cout<<"is blance : "<<tree2.is_blance()<<endl;
+//			}
+//		}
 	}
 }
 
