@@ -1,4 +1,5 @@
 #pragma once
+
 /// \@红黑树的五个性质：
 /// \@1）每个结点要么是红的，要么是黑的。
 /// \@2）根结点是黑的。
@@ -12,6 +13,7 @@
 //因为第1条该树上的节点非红即黑，由于第4条该树上不允许存在两个连续的红节点，那么对于从一个节点到其叶子节点的一条最长的路径一定是红黑交错的，那么最短路径一定是纯黑色的节点；而又第5条从任一节点到其叶子节点的所有路径上都包含相同数目的黑节点，这么来说最长路径上的黑节点的数目和最短路径上的黑节点的数目相等！而又第2条根结点为黑、第3条叶子节点是黑，那么可知：最长路径<=2*最短路径。一颗二叉树的平衡性能越好，那么它的效率越高！显然红黑树的平衡性能比AVL的略差些，但是经过大量试验证明，实际上红黑树的效率还是很不错了，仍能达到O(logN)，这个我不知道，我现在不可能做过大量试验，只是听人家这样说，O(∩_∩)O哈哈~但你至少知道他的时间复杂度一定小于2O(logN)!
 
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 namespace RB{
 	//枚举节点颜色
@@ -117,10 +119,10 @@ namespace RB{
 				int _left = _height(_root->left);
 				int _right = _height(_root->right);
 
-				if( _left > _right && 2*_left > _right ){//左子树高于右子树两倍以上
+				if( _left > _right && _left > 2 * _right ){//左子树高于右子树两倍以上
 					return false;
 				}
-				if( _left < _right && _left < _right*2 ){//右子树高于左子树两倍以上
+				if( _left < _right && _left * 2 < _right ){//右子树高于左子树两倍以上
 					return false;
 				}
 
@@ -134,6 +136,7 @@ namespace RB{
 			~rb_tree()
 			{
 				_destroy(root);
+				root = NULL;
 			}
 
 			//插入新节点总是红色节点, 因为不会破坏性质 5, 尽可能维持所有性质.
@@ -152,6 +155,12 @@ namespace RB{
 			bool is_blance()
 			{
 				return _is_blance(root);
+			}
+
+			void destroy()
+			{
+				_destroy(root);
+				root = NULL;
 			}
 
 		private:
@@ -214,7 +223,7 @@ namespace RB{
 				//关于插入，待插入节点颜色必须是红色，因为如果是黑色， 会导致规则5不合法
 				//而如果插入的节点的父节点是红色，而当前节点的颜色也是红色，导致规则4不合法
 				//换句话说，如果待插入节点的父节点是黑色，则不需要调整!!!
-				while( curr && parent->color == RED ){
+				while( curr != _root && parent->color == RED ){
 					node_p grandfather = parent->parent;//肯定不为空，因为parent->color是红色，说明肯定不是根节点（根节点是黑色）
 					if( parent == grandfather->left ){ //父节点是祖父节点的左孩子
 						node_p uncle = grandfather->right; //叔叔节点
@@ -255,10 +264,9 @@ namespace RB{
 						}
 					}
 				}
+				_root->color = BLACK;
 				return true;
 			}
-
-
 
 		private:
 			node_p root;//红黑树树根
@@ -268,6 +276,7 @@ namespace RB{
 	{
 		rb_tree<int, int> tree;
 		int a[] = {2,3,4,1,23,13,34,45,556,67,6};
+	//	int a[] = {2,3,4,1};//,23,13,34,45,556,67,6};
 		int len;
 		len = sizeof(a)/sizeof(a[0]);
 		int i = 0;
@@ -275,6 +284,32 @@ namespace RB{
 			tree.insert(a[i], a[i]);
 		}
 		tree.in_order();
+		cout<<"is blance : "<<tree.is_blance()<<endl;
+
+		//test is blance
+		srand(time(0));
+		rb_tree<int, int> tree1;
+
+		for( i = 0; i < 10000; i++ ){
+			tree1.insert(rand()%1000, i);
+			if( i%100 == 0 ){
+				cout<<"/////////////////////////////////////////////////////////////////"<<endl;
+				tree1.in_order();
+				cout<<"is blance : "<<tree1.is_blance()<<endl;
+				tree1.destroy();
+			}
+		}
+		srand(time(0));
+		rb_tree<int, int> tree2;
+
+		for( i = 0; i < 10000; i++ ){
+			tree2.insert(rand()%10000, i);
+			if( i%100 == 0 ){
+				cout<<"/////////////////////////////////////////////////////////////////"<<endl;
+				tree2.in_order();
+				cout<<"is blance : "<<tree2.is_blance()<<endl;
+			}
+		}
 	}
 }
 
