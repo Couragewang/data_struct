@@ -10,3 +10,114 @@
 //具体讲解之前，有一点，再次强调下：B-树，即为B树。因为B树的原英文名称为B-tree，而国内很多人喜欢把B-tree译作B-树，其实，这是个非常不好的直译，很容易让人产生误解。如人们可能会以为B-树是一种树，而B树又是一种一种树。而事实上是，B-tree就是指的B树。特此说明。
 
 //B树是为磁盘存储而专门设计的一类平衡搜索树，B树的高度仅随着它所包含的节点数按对数增长，不过因为单个节点可以包含多个关键字，所以对数的底数可以比较大，实际应用中一般是50~2000，给个直观的数字，一棵分支因子为1001、高度为2（不包含根节点）的B树，可以存储超过10亿个关键字！
+
+//pair结构，获取查找到的节点信息，地址和索引
+template<class K, class V>
+struct pair{
+	K key;
+	V value;
+	pair(const K &_key = K(), const V &_value = V())
+		:key(_key)
+		,value(_value)
+	{}
+};
+
+//M路平衡B树, 缺省3路B树
+template<class K, size_t M = 3>
+struct B_tree_node{
+
+	//subs[0]是keys[0]的左孩子， subs[1]是keys[0]的右孩子, subs[1]是keys[1]的左孩子...
+	K keys[M]; //当前节点的key值集合，第M－1个位置不保存实际数据，后期分裂时方便处理
+	B_tree_node<K, M> *subs[M+1]; //与key对应的节点子节点地址,第M个位置不使用，方便分裂
+	size_t size;   //当前节点个数
+
+	B_tree_node<K, M> *parent; //回指父节点
+	B_tree_node()
+		:size(0)
+		,parent(NULL)
+	{
+		for(int i = 0; i < M+1; ++i){
+			subs[i] = NULL;
+		}
+	}
+
+};
+
+template<class K, size_t M = 3>
+class B_tree{
+		typedef B_tree_node<K, M> node_t, *node_p;
+
+		node_p _alloc_node( const K &_key )
+		{
+			node_p *tmp = new node_t();
+			tmp->keys[0] = _key;
+			tmp->size = 1;
+			return tmp;
+		}
+
+		pair<node_p, int> _find( const K &_key )
+		{
+			node_p curr = root;
+			node_p parent = NULL;
+			while( curr ){
+				int i = 0;
+				//单节点序列按照升序排列
+				while( i < curr->size && _key > curr->keys[i] ){
+					i++
+				}
+
+				if( i < curr->size && _key == curr->keys[i] ){
+					//find it!
+					return pair()
+				}
+
+				parent = curr;
+				curr = curr->subs[];
+			}
+		}
+	
+	public:
+		B_tree()
+			:root(NULL)
+		{}
+		//插入成功
+		bool insert( const K &_key )
+		{
+			//1. 当前为空树
+			if( !root ){
+				root = _alloc_node(_key);
+				return true;
+			}
+			//2. 不为空树, 但需要确定当前_key是否已经存在
+			pair<node_p, int> res = _find( _key );
+		}
+
+		~B_tree()
+		{}
+	private:
+		node_p root;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
