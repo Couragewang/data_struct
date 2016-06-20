@@ -68,12 +68,15 @@ class B_tree{
 
 				if( i < curr->size && _key == curr->keys[i] ){
 					//find it!
-					return pair()
+					return pair<node_p, int>(curr, i);
 				}
 
 				parent = curr;
-				curr = curr->subs[];
+				curr = curr->subs[i];
 			}
+
+			//不存在，可以插入
+			return pair<node_p, int>(parent, -1);
 		}
 	
 	public:
