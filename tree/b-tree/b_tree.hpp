@@ -78,6 +78,16 @@ class B_tree{
 			//不存在，可以插入
 			return pair<node_p, int>(parent, -1);
 		}
+
+		//插入key肯定可以成功，因为我们预留了位置
+		void _insert_key(node_p curr, const K &key, node_p new_sub)
+		{
+			int i = curr->size-1;
+			while( i>= 0 ){ //从后往前查找比较移动
+				if( key < curr->keys[i] ){ //注意升序
+				}
+			}
+		}
 	
 	public:
 		B_tree()
@@ -93,7 +103,27 @@ class B_tree{
 			}
 			//2. 不为空树, 但需要确定当前_key是否已经存在
 			pair<node_p, int> res = _find( _key );
-		}
+			//只有不存在该节点的时候，才需要插入
+			if( res.second != -1 ){
+				return false; //目标节点已经存在, 不需要插入数据
+			}
+
+			K key = _key;
+			node_p *curr = res.first;//待插入节点的位置，肯定是有空间可插入的
+			node_p new_sub = NULL;
+
+			while(curr){ //可能在插入新的key之后，产生分裂，key值上移，造成连续分裂
+
+				//3. 在目标位置插入key值
+				_insert_key(curr, key, new_sub); //可能会因为分裂导致有新分裂节点
+
+				if( curr->size < M ){//当前节点的数据个数未达到峰值，不需要分裂, 插入完成 
+					return true;
+				}
+				//4. 否则，开始分裂
+
+			}
+		} 
 
 		~B_tree()
 		{}
