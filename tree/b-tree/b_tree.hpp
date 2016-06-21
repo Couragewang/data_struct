@@ -85,7 +85,18 @@ class B_tree{
 			int i = curr->size-1;
 			while( i>= 0 ){ //从后往前查找比较移动
 				if( key < curr->keys[i] ){ //注意升序
+					curr->keys[i+1] = curr->keys[i];
+					curr->subs[i+2] = curr->subs[i+1];
+					i--;
+				}else{
+					break;
 				}
+			}
+		    curr->keys[i+1] = key;
+			curr->sub[i+2]  = new_sub;
+			curr->size++;
+			if(new_sub){
+				new_sub->parent = curr;
 			}
 		}
 	
