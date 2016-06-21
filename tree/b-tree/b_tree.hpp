@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 
+using namespace std;
 //动态查找树主要有：二叉查找树（Binary Search Tree），平衡二叉查找树（Balanced Binary Search Tree），红黑树(Red-Black Tree )，B-tree/B+-tree/ B*-tree (B~Tree)。前三者是典型的二叉查找树结构，其查找的时间复杂度O(log2N)与树的深度相关，那么降低树的深度自然会提高查找效率。
 //但是咱们有面对这样一个实际问题：就是大规模数据存储中，实现索引查询这样一个实际背景下，树节点存储的元素数量是有限的（如果元素数量非常多的话，查找就退化成节点内部的线性查找了），这样导致二叉查找树结构由于树的深度过大而造成磁盘I/O读写过于频繁，进而导致查询效率低下（为什么会出现这种情况，待会在外部存储器-磁盘中有所解释），那么如何减少树的深度（当然是不能减少查询的数据量），一个基本的想法就是：采用多叉树结构（由于树节点元素数量是有限的，自然该节点的子树数量也就是有限的）。
 //也就是说，因为磁盘的操作费时费资源，如果过于频繁的多次查找势必效率低下。那么如何提高效率，即如何避免磁盘过于频繁的多次查找呢？根据磁盘查找存取的次数往往由树的高度所决定，所以，只要我们通过某种较好的树结构减少树的结构尽量减少树的高度，那么是不是便能有效减少磁盘查找存取的次数呢？那这种有效的树结构是一种怎样的树呢？
@@ -13,12 +14,12 @@
 
 //pair结构，获取查找到的节点信息，地址和索引
 template<class K, class V>
-struct pair{
-	K key;
-	V value;
-	pair(const K &_key = K(), const V &_value = V())
-		:key(_key)
-		,value(_value)
+struct my_pair{
+	K first;
+	V second;
+	my_pair(const K &_f = K(), const V &_s = V())
+		:first(_f)
+		,second(_s)
 	{}
 };
 
@@ -40,7 +41,6 @@ struct B_tree_node{
 			subs[i] = NULL;
 		}
 	}
-
 };
 
 template<class K, size_t M = 3>
@@ -49,13 +49,13 @@ class B_tree{
 
 		node_p _alloc_node( const K &_key = K() )
 		{
-			node_p *tmp = new node_t();
+			node_p tmp = new node_t();
 			tmp->keys[0] = _key;
 			tmp->size = 1;
 			return tmp;
 		}
 
-		pair<node_p, int> _find( const K &_key )
+		my_pair<node_p, int> _find( const K &_key )
 		{
 			node_p curr = root;
 			node_p parent = NULL;
@@ -63,12 +63,12 @@ class B_tree{
 				int i = 0;
 				//单节点序列按照升序排列
 				while( i < curr->size && _key > curr->keys[i] ){
-					i++
+					i++;
 				}
 
 				if( i < curr->size && _key == curr->keys[i] ){
 					//find it!
-					return pair<node_p, int>(curr, i);
+					return my_pair<node_p, int>(curr, i);
 				}
 
 				parent = curr;
@@ -76,7 +76,7 @@ class B_tree{
 			}
 
 			//不存在，可以插入
-			return pair<node_p, int>(parent, -1);
+			return my_pair<node_p, int>(parent, -1);
 		}
 
 		//插入key肯定可以成功，因为我们预留了位置
@@ -93,7 +93,7 @@ class B_tree{
 				}
 			}
 		    curr->keys[i+1] = key;
-			curr->sub[i+2]  = new_sub;
+			curr->subs[i+2]  = new_sub;
 			curr->size++;
 			if(new_sub){
 				new_sub->parent = curr;
@@ -111,7 +111,7 @@ class B_tree{
 				cout<<_root->keys[i]<<" ";
 			}
 
-			_in_order(_root->sub[_root->size]);
+			_in_order(_root->subs[_root->size]);
 		}
 
 	public:
@@ -127,14 +127,14 @@ class B_tree{
 				return true;
 			}
 			//2. 不为空树, 但需要确定当前_key是否已经存在
-			pair<node_p, int> res = _find( _key );
+			my_pair<node_p, int> res = _find( _key );
 			//只有不存在该节点的时候，才需要插入
 			if( res.second != -1 ){
 				return false; //目标节点已经存在, 不需要插入数据
 			}
 
 			K key = _key;
-			node_p *curr = res.first;//待插入节点的位置，肯定是有空间可插入的
+			node_p curr = res.first;//待插入节点的位置，肯定是有空间可插入的
 			node_p new_sub = NULL;
 
 			while(curr){ //可能在插入新的key之后，产生分裂，key值上移，造成连续分裂
@@ -179,39 +179,24 @@ class B_tree{
 					curr->parent = tmp->parent = root;
 				}
 
-				sub = tmp;
+				new_sub = tmp;
 				curr = curr->parent; 
 			}
 
 			return true;
 		} 
 
+		void in_order()
+		{
+			cout<<"in order: ";
+			_in_order( root );
+			cout<<endl;
+		}
+		
 		~B_tree()
 		{}
 	private:
 		node_p root;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
