@@ -47,7 +47,7 @@ template<class K, size_t M = 3>
 class B_tree{
 		typedef B_tree_node<K, M> node_t, *node_p;
 
-		node_p _alloc_node( const K &_key )
+		node_p _alloc_node( const K &_key = K() )
 		{
 			node_p *tmp = new node_t();
 			tmp->keys[0] = _key;
@@ -100,6 +100,20 @@ class B_tree{
 			}
 		}
 	
+		void _in_order( node_p &_root)
+		{
+			if( !_root ){
+				return;
+			}
+
+			for( int i = 0; i < _root->size; ++i ){
+				_in_order( _root->subs[i] );
+				cout<<_root->keys[i]<<" ";
+			}
+
+			_in_order(_root->sub[_root->size]);
+		}
+
 	public:
 		B_tree()
 			:root(NULL)
@@ -132,8 +146,44 @@ class B_tree{
 					return true;
 				}
 				//4. 否则，开始分裂
+				int boundary = M/2;
+				int index = 0;
+				key = curr->keys[boundary]; //新的键值
+				node_p tmp = _alloc_node();
+				for( int i = boundary+1; i < curr->size; ++i){
+					tmp->keys[index++] = curr->keys[i];
+					curr->keys[i] = K();
+					tmp->size++;
+				}
 
+				//subs多拷贝一次
+				index = 0;
+				for( int i = boundary+1; i <= curr->size; ++i ){
+					tmp->subs[index] = curr->subs[i];
+					curr->subs[i] = NULL;
+					if(tmp->subs[i]){
+						tmp->subs[i]->parent = tmp;
+					}
+				}
+
+				curr->size /= 2;
+				//分裂之后，等于在满节点中重新选择一个key，分裂当前节点，然后将新key插入上级节点,所以分裂完毕之后，需要在curr中清除掉key，防止数据重复
+				curr->keys[boundary] = K();
+
+				//如果是父节点分裂
+				if( curr->parent == NULL ){
+					root = _alloc_node(key);
+					root->subs[0] = curr;
+					root->subs[1] = tmp;
+					root->size = 1;
+					curr->parent = tmp->parent = root;
+				}
+
+				sub = tmp;
+				curr = curr->parent; 
 			}
+
+			return true;
 		} 
 
 		~B_tree()
