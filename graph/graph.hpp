@@ -27,6 +27,9 @@
 
 #include <iostream>
 
+using namespace std;
+
+
 template<class V, class W> // V->节点集合, W->边权值
 class graph_matrix{
 	public:
@@ -77,6 +80,19 @@ class graph_matrix{
 
 		void display()
 		{
+			int i = 0;
+			for( ; i < matrix_size; ++i ){
+				cout<<vertexs[i]<<'\t';
+			}
+			cout<<endl;
+
+			for( i = 0; i < matrix_size; ++i ){
+				for( int j = 0; j < matrix_size; ++j ){
+					cout<<matrix[i][j]<<'\t';
+				}
+				cout<<endl;
+			}
+			cout<<endl;
 		}
 
 		~graph_matrix()
