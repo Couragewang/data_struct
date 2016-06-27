@@ -29,7 +29,7 @@
 
 using namespace std;
 
-
+//临界矩阵
 template<class V, class W> // V->节点集合, W->边权值
 class graph_matrix{
 	public:
@@ -37,8 +37,10 @@ class graph_matrix{
 		{}
 
 		//_vertexs定点的集合，_size定点的大小
+//		graph_matrix(const V *_vertexs, int _size, bool _is_dir_graph)
 		graph_matrix(const V *_vertexs, int _size)
 			:matrix_size(_size)
+//			,is_dir_graph(_is_dir_graph)
 		{
 			vertexs = new V[_size]; //申请空间，向量，保存节点信息
 			matrix  = new W*[_size]; //开辟矩阵
@@ -101,7 +103,131 @@ class graph_matrix{
 		V* vertexs; //顶点集合
 		W** matrix; //临接矩阵
 		int matrix_size; //顶点个数
+		//bool is_dir_graph;
 };
+
+//临接表
+template<class V, class W> //V -> 节点类型，W -> 边权值
+struct link_edge{
+	W weight;
+	int src_index;
+	int dst_index;
+	struct link_edge<V, W> *next;
+
+	link_edge(int _src_index = -1, int _dst_index = -1, const W &_weight = W())
+		:src_index(_src_index)
+		,dst_index(_dst_index)
+		,weight(_weight)
+	{}
+};
+
+template<class V, class W>
+struct link_vertex{
+	V vertex;
+	struct link_edge<V, W> *head;
+
+	link_vertex(const V _vertex = V())
+		:vertex(_vertex)
+		,head(NULL)
+	{}
+};
+
+
+template<>
+class graph_link{
+	priate:
+		void _add_edge(int _src_index, int _dst_index, const W &_weight)
+		{
+			link_edge<V, W> *_pos = link_table[_src_index].head;
+			link_edge<V, W> *_tmp = new link_edge( _src_index, _dst_index, _weight);
+
+			//头插
+			_tmp->next = _pos;
+			link_table[_src_index].head = _tmp;
+		}
+
+	public:
+		//缺省构造函数
+		graph_link()
+			:link_table(NULL)
+			,vertex_size(0)
+			,isdir_graph(false)
+		{}
+
+		//构造函数
+		graph_link( V *arr, int size, bool _isdir_graph = false )
+			:vertex_size(size)
+			,isdir_graph(_isdir_graph)
+		{
+			assert(arr);
+
+			link_table = new link_vertex[size];
+			int i = 0;
+			for( ; i < size; ++i ){
+				link_table[i].vertex = arr[i];
+			}
+		}
+
+		int get_vertex_index( const V &_vertex)
+		{
+			int i = 0;
+			for( ; i < vertex_size; ++i ){
+				if( link_table[i] == _vertex ){
+					return i;
+				}
+			}
+			return -1;//节点不存在
+		}
+
+		void add_edge( const V &_src_vertex, const V &_dst_vertex, const W& _weight)
+		{
+			int _src_index = get_vertex_index( _src_vertex ); //获取节点内容对应的索引编号
+			int _dst_index = get_vertex_index( _dst_vertex ); //获取节点内容对应的索引编号
+
+			if( _src_index >= 0 && _dst_index >= 0 ){ //获得的下表必须合法
+				if( isdir_graph ){//如果是有向图，则添加两次
+					//这里添加两次有待商榷，因为你不能保证，对于有向图来讲，两个节点彼此直接相连，但它们的
+					//弧权值相同！ 建议将该函数简单设计，由上层决定是否添加两次
+					_add_edge(_src_index, _dst_index, _weight);
+					_add_edge(_dst_index, _src_index, _weight);
+				}else{
+					_add_edge(_src_index, _dst_index, _weight);
+				}
+			}
+		}
+
+		~graph_link()
+		{}
+	private:
+			link_vertex<V, W> *link_table;
+			int vertex_size;
+			bool isdir_graph;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
