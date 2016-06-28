@@ -26,6 +26,7 @@
 //克鲁斯卡尔算法:
 
 #include <iostream>
+#include <assert.h>
 
 using namespace std;
 
@@ -132,14 +133,13 @@ struct link_vertex{
 	{}
 };
 
-
-template<>
+template<class V, class W>
 class graph_link{
-	priate:
+	private:
 		void _add_edge(int _src_index, int _dst_index, const W &_weight)
 		{
 			link_edge<V, W> *_pos = link_table[_src_index].head;
-			link_edge<V, W> *_tmp = new link_edge( _src_index, _dst_index, _weight);
+			link_edge<V, W> *_tmp = new link_edge<V, W>( _src_index, _dst_index, _weight);
 
 			//头插
 			_tmp->next = _pos;
@@ -155,13 +155,13 @@ class graph_link{
 		{}
 
 		//构造函数
-		graph_link( V *arr, int size, bool _isdir_graph = false )
+		graph_link( const V *arr, int size, bool _isdir_graph = false )
 			:vertex_size(size)
 			,isdir_graph(_isdir_graph)
 		{
 			assert(arr);
 
-			link_table = new link_vertex[size];
+			link_table = new link_vertex<V, W>[size];
 			int i = 0;
 			for( ; i < size; ++i ){
 				link_table[i].vertex = arr[i];
@@ -172,7 +172,7 @@ class graph_link{
 		{
 			int i = 0;
 			for( ; i < vertex_size; ++i ){
-				if( link_table[i] == _vertex ){
+				if( link_table[i].vertex == _vertex ){
 					return i;
 				}
 			}
@@ -194,6 +194,22 @@ class graph_link{
 					_add_edge(_src_index, _dst_index, _weight);
 				}
 			}
+		}
+	
+		void display()
+		{
+			int i = 0;
+			for( ; i < vertex_size; ++i ){
+				cout<<link_table[i].vertex<<" [ "<< i <<" ] -> ";
+				link_edge<V, W> *start = link_table[i].head;
+
+				while( start ){
+					cout<<start->weight<<" [ "<<start->dst_index<<" ] -> ";
+					start = start->next;
+				}
+				cout<<"NULL"<<endl;
+			}
+			cout<<endl;
 		}
 
 		~graph_link()
